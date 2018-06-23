@@ -1,4 +1,4 @@
-import { logger } from './../../src/tools/logger';
+import { logger } from './../../dist/tools/logger';
 import * as assert from 'assert';
 
 describe('test/tools/logger.ts', () => {
