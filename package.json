@@ -1,4 +1,5 @@
 {
+  "name": "dubbo.js",
   "devDependencies": {
     "@types/assert": "^0.0.31",
     "@types/mocha": "^5.2.3",
