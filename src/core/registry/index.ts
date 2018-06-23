@@ -49,19 +49,61 @@ export class ZKClient extends SDKBase {
       await this._zkClient.await('connected');
     }
 
-    async subscribe({
+    buildConsumerPath(consumerPath, {
+      protocol,
+      uniqueId,
+      timeout,
+      appName
+    }) {
+      const consumerUrl = format(
+        '%s://%s?uniqueId=%s&version=%s&pid=%s&timeout=%s&appName=%s&serialization=%s&startTime=',
+        protocol,
+        localIp,
+        uniqueId || '',
+        '1.0',
+        process.pid,
+        timeout,
+        appName || '',
+        Date.now()
+      );
+
+      const path = consumerPath + '/' + encodeURIComponent(consumerUrl);
+
+      return path;
+    }
+
+    async registerConsumer({
       interfaceName,
       protocol,
       uniqueId,
       timeout,
       appName
-    }, listener) {
+    }) {
+      const consumerPath = this.buildConsumerRoot(interfaceName);
+      const path = this.buildConsumerPath(consumerPath, {
+        protocol,
+        uniqueId,
+        timeout,
+        appName
+      });
+      try {
+        await this._zkClient.mkdirp(consumerPath);
+        await this._zkClient.create(path, EMPTY, CreateMode.EPHEMERAL);
+      } catch (e) {
+        this.logger.warn('[ZookeeperRegistry] create consumerPath: %s failed, caused by %s', path, e.message);
+      }
+    }
+
+    async subscribe(options, listener) {
+      const { interfaceName } = options;
       this.on(interfaceName, listener);
 
       if (!this._subscribeMap.has(interfaceName)) {
         this._subscribeMap.set(interfaceName, null);
-        const providerPath = this.buildProviderPath(interfaceName);
+
+        const providerPath = this.buildProviderRoot(interfaceName);
         await this._zkClient.mkdirp(providerPath);
+        await this.registerConsumer(options);
 
         this._zkClient.watchChildren(providerPath, (err, children) => {
           if (err) {
@@ -69,33 +111,9 @@ export class ZKClient extends SDKBase {
           }
 
           const addressList = children.map(url => decodeURIComponent(url));
-
           this.emit(interfaceName, addressList);
-
           this._subscribeMap.set(interfaceName, addressList);
         });
-
-        const consumerPath = this.buildConsumerPath(interfaceName);
-        const consumerUrl = format(
-          '%s://%s?uniqueId=%s&version=%s&pid=%s&timeout=%s&appName=%s&serialization=%s&startTime=',
-          protocol,
-          localIp,
-          uniqueId || '',
-          '1.0',
-          process.pid,
-          timeout,
-          appName || '',
-          Date.now()
-        );
-
-        const path = consumerPath + '/' + encodeURIComponent(consumerUrl);
-
-        try {
-          await this._zkClient.mkdirp(consumerPath);
-          await this._zkClient.create(path, EMPTY, CreateMode.EPHEMERAL);
-        } catch (e) {
-          this.logger.warn('[ZookeeperRegistry] create consumerPath: %s failed, caused by %s', path, e.message);
-        }
       } else {
         const addressList = this._subscribeMap.get(interfaceName);
         if (addressList) {
@@ -104,24 +122,40 @@ export class ZKClient extends SDKBase {
       }
     }
 
-    // unSubscribe(config, listener) {
+    async unSubscribe({ 
+      interfaceName,
+      protocol,
+      uniqueId,
+      timeout,
+      appName
+    }, listener) {
+      assert(interfaceName, '[ZookeeperRegistry] unSubscribe(config, listener) config.interfaceName is required');
+  
+      if (listener) {
+        this.removeListener(interfaceName, listener);
+      } else {
+        this.removeAllListeners(interfaceName);
+      }
 
-    // }
+      if (this.listenerCount(interfaceName) === 0) {
+        const providerPath = this.buildProviderRoot(interfaceName);
+        await this._zkClient.unWatchChildren(providerPath);
+        this._subscribeMap.delete(interfaceName);
+        // const consumerRoot = this.buildConsumerRoot(interfaceName)
+        // const children = await this._zkClient.getChildren(consumerRoot);
+        // await this._zkClient.remove(path);
+      }
+    }
 
-    buildProviderPath(interfaceName) {
+    buildProviderRoot(interfaceName) {
       return `/${this.root}/${interfaceName}/providers`;
     }
 
-    buildConsumerPath(interfaceName) {
+    buildConsumerRoot(interfaceName) {
       return `/${this.root}/${interfaceName}/consumers`;
     }
 
-    async close(callback) {
-      try {
-        await this._zkClient.close();
-        callback();
-      } catch (e) {
-        callback(e);
-      }
+    async close() {
+      await this._zkClient.close();
     }
 }

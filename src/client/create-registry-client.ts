@@ -1,7 +1,6 @@
 import { ZKAPIClientOptions } from './interface/zk-api-client-options';
 import { ZKClient } from './../core/registry/index';
 import { APIClientBase } from 'cluster-client';
-// import * as pify from 'pify';
 
 
 export class RegistryAPIClient extends APIClientBase {
@@ -12,7 +11,7 @@ export class RegistryAPIClient extends APIClientBase {
       return this.options.logger;
     }
 
-    constructor(options: any) {
+    constructor(options: ZKAPIClientOptions) {
       super(Object.assign({}, options, {
         initMethod: '_init'
       }));
@@ -26,8 +25,19 @@ export class RegistryAPIClient extends APIClientBase {
 
     get delegates() {
       return {
-        'subscribe': 'subscribe'
       };
+    }
+
+    subscribe(config, listener) {
+      this._client.subscribe(config, listener);
+    }
+  
+    unSubscribe(config, listener) {
+      this._client.unSubscribe(config, listener);
+    }
+
+    close() {
+      return this._client.close();
     }
 
     async _init() {
@@ -35,3 +45,6 @@ export class RegistryAPIClient extends APIClientBase {
     }
 }
 
+export default function createRegistryClient(options) {
+  return new RegistryAPIClient(options);
+}

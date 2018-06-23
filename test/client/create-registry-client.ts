@@ -1,23 +1,23 @@
-import { ZKClient } from './../../../dist/core/registry/index';
+import createRegistryClient from './../../dist/client/create-registry-client';
 import assert from 'assert';
 
-describe('test/core/registry/index.ts', () => {
-    let zk;
+describe('test/client/create-registry-client.ts', () => {
+    let client;
     it('new ZKClient()', () => {
-        zk = new ZKClient({
+        client = createRegistryClient({
             logger: console,
             zkHosts: '10.170.164.121:2181'
-        });
+        })
     });
 
     it('await zk.ready', async () => {
-        await zk.ready();
+        await client.ready();
     });
 
 
     it('await subscribe', async () => {
         const res = await new Promise(function(resolve) {
-            zk.subscribe({
+            client.subscribe({
                 interfaceName: 'com.netease.haitao.message.service.MessageFatigueServiceFacade'
             }, (result: string[]) => {
                 resolve(result);
@@ -28,12 +28,12 @@ describe('test/core/registry/index.ts', () => {
     });
 
     it('unSubscribe', async () => {
-        await zk.unSubscribe({
+        await client.unSubscribe({
             interfaceName: 'com.netease.haitao.message.service.MessageFatigueServiceFacade'
         })
     });
 
     after(async function() {
-        await zk.close((e?) => {});
+        await client.close();
     })
 })
