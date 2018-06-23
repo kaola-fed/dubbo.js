@@ -31,7 +31,7 @@ export class RegistryAPIClient extends APIClientBase {
     subscribe(config, listener) {
       this._client.subscribe(config, listener);
     }
-  
+
     unSubscribe(config, listener) {
       this._client.unSubscribe(config, listener);
     }

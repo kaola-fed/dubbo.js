@@ -122,7 +122,7 @@ export class ZKClient extends SDKBase {
       }
     }
 
-    async unSubscribe({ 
+    async unSubscribe({
       interfaceName,
       protocol,
       uniqueId,
@@ -130,7 +130,7 @@ export class ZKClient extends SDKBase {
       appName
     }, listener) {
       assert(interfaceName, '[ZookeeperRegistry] unSubscribe(config, listener) config.interfaceName is required');
-  
+
       if (listener) {
         this.removeListener(interfaceName, listener);
       } else {
