@@ -19,7 +19,6 @@
     "test": "mocha --require ts-node/register --watch-extensions ts 'test/*/*.ts'",
     "lint": "eslint src --ext .ts"
   },
-  "name": "dubbo.js",
   "description": "",
   "version": "1.0.0",
   "main": "dist/index.js",
@@ -37,6 +36,7 @@
   "dependencies": {
     "@types/node": "^10.3.5",
     "assert": "^1.4.1",
+    "sdk-base": "^3.4.0",
     "zookeeper-cluster-client": "^2.0.1"
   },
   "husky": {
