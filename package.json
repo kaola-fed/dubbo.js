@@ -1,0 +1,47 @@
+{
+  "devDependencies": {
+    "@types/assert": "^0.0.31",
+    "@types/mocha": "^5.2.3",
+    "babel-eslint": "^8.2.4",
+    "eslint": "^5.0.0",
+    "eslint-config-alloy": "^1.4.2",
+    "eslint-plugin-typescript": "^0.12.0",
+    "husky": "^1.0.0-rc.9",
+    "ts-node": "^7.0.0",
+    "typescript": "^2.9.2",
+    "typescript-eslint-parser": "^16.0.0"
+  },
+  "scripts": {
+    "tsn": "ts-node",
+    "dev": "npm run build -- --watch",
+    "build": "tsc",
+    "test": "mocha --require ts-node/register --watch-extensions ts 'test/*/*.ts'",
+    "lint": "eslint src --ext .ts"
+  },
+  "name": "dubbo.js",
+  "description": "",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ImHype/dubbo.js.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ImHype/dubbo.js/issues"
+  },
+  "homepage": "https://github.com/ImHype/dubbo.js#readme",
+  "dependencies": {
+    "@types/node": "^10.3.5",
+    "assert": "^1.4.1",
+    "zookeeper-cluster-client": "^2.0.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint -- --fix",
+      "pre-push": "npm test"
+    }
+  }
+}
