@@ -1,1 +1,2 @@
 import './registry';
+import './consumer';

@@ -7,7 +7,8 @@
     "outDir": "dist",
     "rootDir": "src",
     "baseUrl": ".",
-    "declaration": true
+    "declaration": true,
+    "inlineSourceMap": true
   },
   "include": [
     "src",

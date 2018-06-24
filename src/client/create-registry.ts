@@ -1,3 +1,4 @@
+import { logger } from './../tools/logger';
 import { ZKClientOptions } from './interface/zk-client-options';
 import { ZKClient } from './../core/registry/index';
 import { APIClientBase } from 'cluster-client';
@@ -12,8 +13,10 @@ export class RegistryAPIClient extends APIClientBase {
     }
 
     constructor(options: ZKClientOptions) {
-      super(Object.assign({}, options, {
-        initMethod: '_init'
+      super(Object.assign({
+        logger
+      }, options, {
+        initMethod: '_init',
       }));
 
       this.options = options;
