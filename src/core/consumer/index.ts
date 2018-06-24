@@ -1,3 +1,5 @@
+import { InvokeOptions } from './../../interface/invoke-options';
+import { Discoverer } from './discoverer';
 import { ConsumerOptions } from './../../interface/consumer-options';
 import { CircuitBreaker } from './circuit-breaker';
 import SDKBase from 'sdk-base';
@@ -5,7 +7,13 @@ import assert from 'assert';
 import URL from 'url';
 import querystring from 'querystring';
 import { groupCircuitBreaker } from '../../tools/group-circuit-breaker';
-import { random } from './load-balancer';
+import { randomLoadBalance, roundRoubinLoadBalance } from './load-balancer';
+
+const serverAddress = Symbol('serverAddress');
+enum states {
+  normal,
+  discovery
+}
 
 class NoneProviderError extends Error {
   constructor(consumer) {
@@ -14,7 +22,6 @@ class NoneProviderError extends Error {
     this.message = `Consumer - {interfaceName: ${consumer.interfaceName}, group: ${consumer.group || ''}, version: ${consumer.version || ''}} 不存在可用服务提供方`;
   }
 }
-
 
 class AllCircuitBreakersOpenedError extends Error {
   constructor(consumer) {
@@ -26,6 +33,7 @@ class AllCircuitBreakersOpenedError extends Error {
 
 export class Consumer extends SDKBase {
     options: ConsumerOptions;
+    discoverer: Discoverer;
 
     get check() {
       return this.options.check;
@@ -35,130 +43,12 @@ export class Consumer extends SDKBase {
       return this.options.registry;
     }
 
-    get interfaceName() {
-      return this.options.interfaceName;
+    get serverAddress() {
+      return this[serverAddress];
     }
 
-    get methods() {
-      return this.options.methods;
-    }
-
-    get group() {
-      return this.options.group || '';
-    }
-
-    get version() {
-      return this.options.version || '';
-    }
-
-    get protocol() {
-      return this.options.protocol;
-    }
-
-    serverAddressList: Array<CircuitBreaker>;
-    balancerLoad;
-
-    constructor(options) {
-      super(Object.assign({}, options, {
-        initMethod: '_init',
-      }));
-
-      this.options = options;
-      assert(options.registry || options.serverHosts, 'new ConsumerDataClient(options) 需要指定 options.serverHosts');
-    }
-
-    getProviderMetaList(addressList) {
-      return addressList.map(address => {
-        address = decodeURIComponent(address);
-        const { protocol, hostname, port, query } = URL.parse(address);
-        const meta = querystring.parse(query);
-
-        return {
-          protocol,
-          hostname,
-          port,
-          meta
-        };
-      });
-    }
-
-    checkMethods(providerMetaList) {
-      if (!this.methods || this.methods.length === 0) {
-        return providerMetaList;
-      }
-
-      return providerMetaList.filter(({ meta }) => {
-        const methods = (meta.methods || '').split(',');
-        return this.methods.every(method => {
-          return methods.includes(method);
-        });
-      });
-    }
-
-    filterProvider(providerMetaList) {
-      return providerMetaList.filter(({ meta, protocol }) => {
-        const version = meta.version ? meta.version : meta['default.version'];
-        const group = meta.group ? meta.group : meta['default.group'];
-
-        const isVersionMatched = !this.version || version === this.version;
-        const isGroupMatched = !this.group || group === this.group;
-        const isProtocolMatched = !this.protocol || protocol === (this.protocol + ':');
-
-        return isVersionMatched && isGroupMatched && isProtocolMatched;
-      });
-    }
-
-    invoke(method, args, callback) {
-      if (this.serverAddressList.length === 0) {
-        return callback(new NoneProviderError(this));
-      }
-
-      const { halfOpened, opened, closed } = groupCircuitBreaker(this.serverAddressList);
-
-      if (halfOpened.length > 0 && this.isExploreTraffic()) {
-        // 探活流量
-        let item = random(halfOpened);
-
-      } else if (closed.length > 0) {
-        // 正常访问
-        let item = random(closed);
-
-      } else {
-        if (closed.length === this.serverAddressList.length) {
-          return callback(new AllCircuitBreakersOpenedError(this));
-        }
-      }
-
-      callback(null, {});
-    }
-
-    isExploreTraffic() {
-      return Math.random() < 0.05;
-    }
-
-    // 磨平 registry 与 direct 模式的差异，最终生效的都为 serverAddressList
-    async _init() {
-      if (this.registry) {
-        await this.discovery();
-      } else {
-        this.direct();
-      }
-
-      if (this.check && this.serverAddressList.length === 0) {
-        throw new NoneProviderError(this);
-      }
-    }
-
-    initServerAddress(serverAddress) {
-      this.serverAddressList = this.initCircuitBreakers(serverAddress);
-    }
-
-    initLoadBanlancers(list) {
-      return random(list);
-    }
-
-    initCircuitBreakers(serverAddress) {
-      return serverAddress
+    set serverAddress(serverAddress) {
+      this[serverAddress] = serverAddress
         .map(
           ({ protocol, hostname, port }) => new CircuitBreaker({
             meta: {
@@ -170,25 +60,80 @@ export class Consumer extends SDKBase {
         );
     }
 
+    serverAddressList: Array<CircuitBreaker>;
+    balancerLoad: Function;
+
+    constructor(options) {
+      super(Object.assign({}, options, {
+        initMethod: '_init',
+      }));
+
+      this.options = options;
+      this.balancerLoad = randomLoadBalance();
+      assert(options.registry || options.serverHosts, 'new ConsumerDataClient(options) 需要指定 options.serverHosts');
+    }
+
+    async invoke(method, args, options: InvokeOptions = {}) {
+      if (this.serverAddress.length === 0) {
+        throw new NoneProviderError(this);
+      }
+
+      const { halfOpened, closed } = CircuitBreaker.group(this.serverAddress);
+
+      if (closed.length === this.serverAddress.length) {
+        throw new AllCircuitBreakersOpenedError(this);
+      }
+
+      // @TODO
+      // 1. protocol.encode
+      // 2. 判断是否需要探活，生成对应的 serverAddress
+
+      let item; let
+        state;
+      if (halfOpened.length > 0 && this.isExploreTraffic() && options.retry === 1) {
+        // 探活流量
+        item = this.balancerLoad(halfOpened, 'halfOpened');
+        state = states.discovery;
+      } else if (closed.length > 0) {
+        // 正常访问
+        item = this.balancerLoad(closed, 'closed');
+        state = states.normal;
+      }
+
+      // 3. Socket Pool 代理 socket 复用
+      // 4. Retry
+
+      return;
+    }
+
+    isExploreTraffic() {
+      return Math.random() < 0.05;
+    }
+
+    // 抹平 注册中心模式 与 直连 模式的差异，最终生效的都为 this.serverAddress
+    async _init() {
+      if (this.registry) {
+        await this.discovery();
+      } else {
+        this.direct();
+      }
+
+      if (this.check) {
+        if (this.serverAddress.length === 0) {
+          throw new NoneProviderError(this);
+        }
+      }
+    }
+
     async discovery() {
-      this.on('providers-update', (addressList) => {
-        let providers = this.getProviderMetaList(addressList);
-        providers = this.filterProvider(providers);
-        providers = this.checkMethods(providers);
-        this.initServerAddress(providers);
+      const discoverer = new Discoverer(this.options);
+      discoverer.on('update:serverAddress', (serverAddress) => {
+        this.serverAddress = serverAddress;
       });
-
-      this.registry.subscribe({
-        interfaceName: this.interfaceName
-      }, (addressList) => {
-        this.emit('providers-update', addressList);
-      });
-
-      await this.await('providers-update');
+      await discoverer.ready();
     }
 
     direct() {
-      const { serverHosts } = this.options;
-      this.initServerAddress(serverHosts.map(item => URL.parse(item)));
+      this.serverAddress = this.options.serverHosts.map(item => URL.parse(item));
     }
 }
