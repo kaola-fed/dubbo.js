@@ -4,6 +4,7 @@
   "devDependencies": {
     "@types/assert": "^0.0.31",
     "@types/mocha": "^5.2.3",
+    "@types/node": "^10.3.5",
     "babel-eslint": "^8.2.4",
     "eslint": "^5.0.0",
     "eslint-config-alloy": "^1.4.2",
@@ -36,8 +37,6 @@
   },
   "homepage": "https://github.com/ImHype/dubbo.js#readme",
   "dependencies": {
-    "@types/node": "^10.3.5",
-    "address": "^1.0.3",
     "assert": "^1.4.1",
     "cluster-client": "^2.1.1",
     "sdk-base": "^3.4.0",

@@ -7,7 +7,7 @@ class NoneProviderError extends Error {
   constructor(consumer) {
     super();
     this.name = 'NoneProviderError';
-    this.message = `Consumer({interfaceName: ${consumer.interfaceName}, group: ${consumer.group || ''}, version: ${consumer.version || ''}}) 无可用的 Provider`;
+    this.message = `Consumer - {interfaceName: ${consumer.interfaceName}, group: ${consumer.group || ''}, version: ${consumer.version || ''}} 不存在可用服务提供方`;
   }
 }
 
