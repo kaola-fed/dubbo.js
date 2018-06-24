@@ -1,5 +1,5 @@
 import { ZKClientOptions } from '../../interface/zk-client-options';
 
-export interface ZKAPIClientOptions extends ZKClientOptions {
+export interface ZKClientOptions extends ZKClientOptions {
 
 }

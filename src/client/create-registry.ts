@@ -1,17 +1,17 @@
-import { ZKAPIClientOptions } from './interface/zk-api-client-options';
+import { ZKClientOptions } from './interface/zk-client-options';
 import { ZKClient } from './../core/registry/index';
 import { APIClientBase } from 'cluster-client';
 
 
 export class RegistryAPIClient extends APIClientBase {
     _client: ZKClient;
-    options: ZKAPIClientOptions;
+    options: ZKClientOptions;
 
     get logger() {
       return this.options.logger;
     }
 
-    constructor(options: ZKAPIClientOptions) {
+    constructor(options: ZKClientOptions) {
       super(Object.assign({}, options, {
         initMethod: '_init'
       }));
