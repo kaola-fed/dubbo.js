@@ -5,8 +5,6 @@ import { CircuitBreaker } from './circuit-breaker';
 import SDKBase from 'sdk-base';
 import assert from 'assert';
 import URL from 'url';
-import querystring from 'querystring';
-import { groupCircuitBreaker } from '../../tools/group-circuit-breaker';
 import { randomLoadBalance, roundRoubinLoadBalance } from './load-balancer';
 
 const serverAddress = Symbol('serverAddress');
@@ -70,7 +68,7 @@ export class Consumer extends SDKBase {
 
       this.options = options;
       this.balancerLoad = randomLoadBalance();
-      assert(options.registry || options.serverHosts, 'new ConsumerDataClient(options) 需要指定 options.serverHosts');
+      assert(options.registry || options.serverHosts, 'rpcClient.createConsumer(options) 需要指定 options.serverHosts');
     }
 
     async invoke(method, args, options: InvokeOptions = {}) {
@@ -85,11 +83,11 @@ export class Consumer extends SDKBase {
       }
 
       // @TODO
+      // 1. 生成上下文信息
       // 1. protocol.encode
       // 2. 判断是否需要探活，生成对应的 serverAddress
 
-      let item; let
-        state;
+      let item; let state;
       if (halfOpened.length > 0 && this.isExploreTraffic() && options.retry === 1) {
         // 探活流量
         item = this.balancerLoad(halfOpened, 'halfOpened');
@@ -101,7 +99,14 @@ export class Consumer extends SDKBase {
       }
 
       // 3. Socket Pool 代理 socket 复用
-      // 4. Retry
+      // 4.1 返回成功
+      // 4.1.1 protocol.decode
+      // 4.1.2 解析上下文信息
+      // 4.1.3 CircuitBreaker.succ
+      // 4.2 失败
+      // 4.2.1 未超出 Retry阈值，Retry
+      // 4.2.2 如果超出 Retry 阈值，降级（Mock）
+      // 4.2.3 CircuitBreaker.failed
 
       return;
     }
