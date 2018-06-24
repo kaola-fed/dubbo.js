@@ -45,6 +45,6 @@ export class RegistryAPIClient extends APIClientBase {
     }
 }
 
-export default function createRegistryClient(options) {
+export default function createRegistry(options) {
   return new RegistryAPIClient(options);
 }

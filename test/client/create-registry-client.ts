@@ -1,10 +1,10 @@
-import createRegistryClient from './../../dist/client/create-registry-client';
+import createRegistry from './../../dist/client/create-registry';
 import assert from 'assert';
 
 describe('test/client/create-registry-client.ts', () => {
     let client;
     it('new ZKClient()', () => {
-        client = createRegistryClient({
+        client = createRegistry({
             logger: console,
             zkHosts: '10.170.164.121:2181'
         })
