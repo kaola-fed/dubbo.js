@@ -6,4 +6,6 @@ export interface ConsumerOptions {
     group: string;
     protocol: string;
     methods: string[];
+    serverHosts: string[];
+    check: boolean;
 }

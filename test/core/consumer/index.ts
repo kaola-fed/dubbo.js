@@ -1,4 +1,4 @@
-import { ConsumerDataClient } from './../../../dist/core/consumer/index';
+import { Consumer } from './../../../dist/core/consumer/index';
 import assert from 'assert';
 import createRegistry from '../../../dist/client/create-registry';
 
@@ -11,11 +11,10 @@ describe('test/core/consumer/index.ts', () => {
             logger: console,
             zkHosts: '10.170.164.121:2181'
         });
-        
     });
 
     it ('new ConsumerDataClient({registry})', async () => {
-        consumer = new ConsumerDataClient({
+        consumer = new Consumer({
             registry: registry,
             interfaceName: 'com.netease.haitao.message.service.MessageFatigueServiceFacade'
         });
@@ -26,8 +25,8 @@ describe('test/core/consumer/index.ts', () => {
         assert(consumer.serverAddressList.length > 0);
     })
 
-    it ('new ConsumerDataClient({serverHosts})', async () => {
-        consumer = new ConsumerDataClient({
+    it ('new Consumer({serverHosts})', async () => {
+        consumer = new Consumer({
             interfaceName: 'com.netease.haitao.message.service.MessageFatigueServiceFacade',
             serverHosts: [
                 '127.0.0.1:1990'

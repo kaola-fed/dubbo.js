@@ -1,40 +1,37 @@
+import { ConsumerOptions } from './../interface/consumer-options';
+import { Consumer } from './../core/consumer/index';
+import { APIClientBase } from 'cluster-client';
 import { logger } from './../tools/logger';
 import { RpcClientOptions } from './interface/rpc-client-options';
 import SDKBase from 'sdk-base';
+import pify from 'pify';
 import assert from 'assert';
-import createConsumer from './create-consumer';
 
 export class RpcClient extends SDKBase {
-    options: RpcClientOptions;
+  options: any;
 
-    get registry() {
-      return this.options.registry;
-    }
+  constructor(options) {
+    super(Object.assign({}, options, {
+      initMethod: '_init',
+    }));
 
-    get logger() {
-      return this.options.logger;
-    }
+    this.options = options;
 
-    constructor(options) {
-      super(options);
+    assert(options.interfaceName, '请配置 Consumer 的 interfaceName');
+    assert(options.registry || options.serverHosts, '请指定 Consumer 直连 Provider 的 serverHost');
+  }
 
-      this.options = Object.assign({
-        logger
-      }, options);
-      // assert(options.registry, '');
-    }
+  get logger() {
+    return this.options.logger || logger;
+  }
 
-    createConsumer(options) {
-      return createConsumer(Object.assign({}, options, {
-        registry: this.registry
-      }));
-    }
 
-    createProvider() {
+  createConsumer(options: ConsumerOptions) {
+    return new Consumer(options);
+  }
 
-    }
 }
 
-export default function createRpc(options) {
+export default function createRpcClient(options) {
   return new RpcClient(options);
 }
