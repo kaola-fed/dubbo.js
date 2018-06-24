@@ -72,3 +72,7 @@ async function launch() {
 launch()
     .catch(console.error);
 ```
+
+
+## LICENSE
+MIT
