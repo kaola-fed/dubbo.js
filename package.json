@@ -19,7 +19,8 @@
     "dev": "npm run build -- --watch",
     "build": "tsc",
     "test": "TS_NODE_PROJECT=./tsconfig.json mocha --require ts-node/register --require tsconfig-paths/register --watch-extensions ts test/*/*.ts",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint src --ext .ts",
+    "publish:next": "npm publish --tag next"
   },
   "description": "",
   "main": "dist/index.js",
