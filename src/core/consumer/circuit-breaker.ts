@@ -36,7 +36,7 @@ export class CircuitBreaker {
       this.succCount++;
       this.failedCount = 0;
 
-      if (this.isHalfOpened) {
+      if (this.isHalfOpened()) {
         if (this.succCount >= this.limit) {
           this.state = states.Closed;
         }
