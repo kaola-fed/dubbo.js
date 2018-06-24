@@ -22,7 +22,6 @@
     "lint": "eslint src --ext .ts"
   },
   "description": "",
-  "version": "1.0.0",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
