@@ -7,7 +7,7 @@ import assert from 'assert';
 import URL from 'url';
 import { randomLoadBalance, roundRoubinLoadBalance } from './load-balancer';
 
-const serverAddress = Symbol('serverAddress');
+const SERVER_ADDRESS = Symbol('serverAddress');
 enum states {
   normal,
   discovery
@@ -32,6 +32,7 @@ class AllCircuitBreakersOpenedError extends Error {
 export class Consumer extends SDKBase {
     options: ConsumerOptions;
     discoverer: Discoverer;
+    [SERVER_ADDRESS] = [];
 
     get check() {
       return this.options.check;
@@ -42,11 +43,11 @@ export class Consumer extends SDKBase {
     }
 
     get serverAddress() {
-      return this[serverAddress];
+      return this[SERVER_ADDRESS];
     }
 
     set serverAddress(serverAddress) {
-      this[serverAddress] = serverAddress
+      this[SERVER_ADDRESS] = serverAddress
         .map(
           ({ protocol, hostname, port }) => new CircuitBreaker({
             meta: {

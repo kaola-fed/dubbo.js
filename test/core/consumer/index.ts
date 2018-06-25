@@ -22,7 +22,7 @@ describe('test/core/consumer/index.ts', () => {
     });
 
     it ('should consumer.serverAddressList.length > 0', async () => {
-        assert(consumer.serverAddressList.length > 0);
+        assert(consumer.serverAddress.length > 0);
     })
 
     it ('new Consumer({serverHosts})', async () => {
