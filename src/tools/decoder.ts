@@ -5,7 +5,8 @@ const RESPONSE_WITH_EXCEPTION = 0;
 const RESPONSE_VALUE          = 1;
 const RESPONSE_NULL_VALUE     = 2;
 
-export default function decode(heap, protocol) {
+export default function decode(income, protocol) {
+  let heap = income;
   if (protocol.toLowerCase() === 'jsonrpc') {
     try {
       const resp = heap.split('\r\n\r\n');
@@ -21,7 +22,7 @@ export default function decode(heap, protocol) {
         body: heap
       });
     } catch {
-      return Promise.reject({
+      return Promise.resolve({
         code: -1,
         msg: heap
       });
@@ -38,16 +39,16 @@ export default function decode(heap, protocol) {
   try {
     result = new DecoderV2(heap.slice(16, heap.length));
     flag = result.readInt();
+    const e = result.read();
 
     switch (flag) {
       case RESPONSE_NULL_VALUE:
         return Promise.resolve(null);
 
       case RESPONSE_VALUE:
-        return Promise.resolve(result.read());
+        return Promise.resolve(e);
 
       case RESPONSE_WITH_EXCEPTION:
-        const e = result.read();
         return Promise.reject(
           e instanceof Error
             ? e

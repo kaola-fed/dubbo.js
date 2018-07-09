@@ -13,7 +13,7 @@ export function roundRoubinLoadBalance(l) {
 
     let last = lastItemMap.get(mode);
 
-    if (!last && last != 0) {
+    if (!last && last !== 0) {
       last = 0;
     } else {
       if (last < list.length - 1) {

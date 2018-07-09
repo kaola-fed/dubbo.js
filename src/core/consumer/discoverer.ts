@@ -41,28 +41,6 @@ export class Discoverer extends SDKBase {
     this.options = options;
   }
 
-  async _init() {
-    this.on('update:providers', (addressList) => {
-      let providers = Discoverer.getProviderList(addressList);
-      providers = this.filterProvider(providers);
-      providers = Discoverer.checkMethods(providers, this.methods);
-
-      this.emit('update:serverAddress', providers);
-    });
-
-    if (!this.registry || !this.registry.subscribe) {
-      throw new Error('invaled options.registry');
-    }
-
-    this.registry.subscribe({
-      interfaceName: this.interfaceName
-    }, (addressList) => {
-      this.emit('update:providers', addressList);
-    });
-
-    await this.await('update:providers');
-  }
-
   static getProviderList(addressList) {
     return addressList.map(addr => {
       const address = decodeURIComponent(escape(addr));
@@ -89,6 +67,28 @@ export class Discoverer extends SDKBase {
         return METHODS.includes(method);
       });
     });
+  }
+
+  async _init() {
+    this.on('update:providers', (addressList) => {
+      let providers = Discoverer.getProviderList(addressList);
+      providers = this.filterProvider(providers);
+      providers = Discoverer.checkMethods(providers, this.methods);
+
+      this.emit('update:serverAddress', providers);
+    });
+
+    if (!this.registry || !this.registry.subscribe) {
+      throw new Error('invaled options.registry');
+    }
+
+    this.registry.subscribe({
+      interfaceName: this.interfaceName
+    }, (addressList) => {
+      this.emit('update:providers', addressList);
+    });
+
+    await this.await('update:providers');
   }
 
   filterProvider(providerMetaList) {

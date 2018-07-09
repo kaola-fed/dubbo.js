@@ -113,37 +113,6 @@ function connect(...args) {
   return socket;
   //return net.Socket.prototype.connect.call(socket, options);
 }
-
-let HeadBodyBuffers = require('head_body_buffers').HeadBodyBuffers;
-
-function packetLength(data) {
-  return data[0] + (data[1] << 8) + (data[2] << 16);
-}
-
-let hbd = new HeadBodyBuffers(4, packetLength);
-hbd.on('packet', function (packet) {
-  let head = packet.slice(0, 4);
-  let body = packet.slice(4);
-  console.log('head:', head, head.length);
-  console.log('body:', body.toString(), body.length);
-});
-
-
-let Stick = require('stickpackage').stick;
-let stick = new Stick(1024).setReadIntBE('32');
-
-/*
-*  包含两个数据包,10个字节,包头为short，两个字节：[0x00, 0x02],[ 0x00, 0x04]
-*  数据包1:[0x00, 0x02, 0x66, 0x66]
-*  数据包2:[0x00, 0x04, 0x88, 0x02, 0x11, 0x11]
-*/
-
-// 设置收到完整数据触发器
-stick.onData(function (data) {
-  console.log('receive data,length:' + data.length);
-  console.log(data);
-});
-
 let start = 0;
 let socket = connect();
 const lenReg = /Content-Length: (\d+)\r\n/;
@@ -173,8 +142,7 @@ socket.on('data', chunk => {
   if (!chunks.length) {
     bufferLength += extraLength(chunk);
   }
-  stick.putData(chunk);
-  hbd.addBuffer(chunk);
+
   chunks.push(chunk);
   //console.log(111, chunk.toString());
   const heap = Buffer.concat(chunks);

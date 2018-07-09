@@ -124,7 +124,7 @@ export default class Encoder {
       }
       head.splice(i, 1, len);
 
-      return new Buffer(head);
+      return Buffer.from(head);
     }
 
     _body(method, args) {
@@ -144,7 +144,7 @@ export default class Encoder {
       if (args && len) {
         for (index = 0; index < len; index++) {
           type = args[index]['$class'];
-          _paramTypes += type && ~type.indexOf('.')
+          _paramTypes += type && type.indexOf('.') !== -1
             ? 'L' + type.replace(/\./gi, '/') + ';'
             : ENUM_TYPE[type];
         }

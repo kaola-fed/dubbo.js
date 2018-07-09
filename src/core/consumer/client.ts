@@ -80,15 +80,15 @@ class RequestBase {
 
     start() {
       return new Promise((resolve, reject) => {
-        this._resolve = resolve = once(resolve);
-        this._reject = reject = once(reject);
+        this._resolve = once(resolve);
+        this._reject = once(reject);
         let bufferLength = DEFAULT_BUFFER_LENGTH;
         const socket = this._socket;
 
         socket.on('error', err => {
           socket.destroy();
           err.code = SOCKET_ERROR;
-          reject(err);
+          this._reject(err);
         });
 
         socket.on('data', chunk => {
@@ -96,6 +96,7 @@ class RequestBase {
             // console.log('jsonRpc request done');
             this._heap += chunk.toString();
 
+            // TODO: 现在只处理了jsonrpc有content-length的返回，对trunk的返回结果未解析
             if (isover(this._heap)) {
               this._done();
             }
@@ -203,15 +204,18 @@ export class ClientWithPool extends ClientBase {
 
     _getPool(host, port) {
       const key = `${host}:${port}`;
-      return this._pools[key] || (
+
+      if (!this._pools[key]) {
         this._pools[key] = new Pool({
           pool: this._pool,
           connect: {
             host,
             port
           }
-        })
-      );
+        });
+      }
+
+      return this._pools[key];
     }
 
   // Acquire the socket connection from the pool

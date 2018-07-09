@@ -10,10 +10,10 @@ import URL from 'url';
 import { randomLoadBalance /*roundRoubinLoadBalance*/ } from './load-balancer';
 
 const SERVER_ADDRESS = Symbol('serverAddress');
-enum states {
-  normal,
-  discovery
-}
+// enum states {
+//   normal,
+//   discovery
+// }
 
 class NoneProviderError extends Error {
   constructor(consumer) {
@@ -83,16 +83,16 @@ export class Consumer extends SDKBase {
         }
       });
     */
-    constructor(options) {
-      super(Object.assign({}, options, {
+    constructor(opts) {
+      super(Object.assign({}, opts, {
         initMethod: '_init',
       }));
 
-      options = Object.assign({}, {
+      let options = Object.assign({}, {
         dubboVersion: '2.8.0',
         version: '1.0',
         protocol: 'dubbo'
-      }, options);
+      }, opts);
 
       this._encoder = new Encoder(options);
 
@@ -124,16 +124,16 @@ export class Consumer extends SDKBase {
       let item = null;
 
 
-      let state;
+      //let state;
 
       if (halfOpened.length > 0 && this.isExploreTraffic() && options.retry === 1) {
         // 探活流量
         item = this.balancerLoad(halfOpened, 'halfOpened');
-        state = states.discovery;
+        //state = states.discovery;
       } else if (closed.length > 0) {
         // 正常访问
         item = this.balancerLoad(closed, 'closed');
-        state = states.normal;
+        //state = states.normal;
       }
 
       if (!item) {

@@ -36,7 +36,7 @@ async function launch() {
 
   // const dubboRpcClient = createRpcClient({
   //   registry,
-  //   interfaceName: conf.path
+  //   interfaceName: conf.dubboPath
   // });
 
   // const dubboConsumer = dubboRpcClient.createConsumer({
@@ -57,7 +57,7 @@ async function launch() {
     // await dubboConsumer.ready();
 
     // const reg = await dubboConsumer.invoke('registerUser', [{
-    //   $class: conf.dubboPath,
+    //   $class: conf.dubboClass,
     //   $: {
     //     id: {
     //       $class: 'java.lang.Long',
