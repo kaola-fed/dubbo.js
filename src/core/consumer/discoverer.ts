@@ -43,11 +43,16 @@ export class Discoverer extends SDKBase {
 
   async _init() {
     this.on('update:providers', (addressList) => {
-      let providers = this.getProviderList(addressList);
+      let providers = Discoverer.getProviderList(addressList);
       providers = this.filterProvider(providers);
-      providers = this.checkMethods(providers);
+      providers = Discoverer.checkMethods(providers, this.methods);
+
       this.emit('update:serverAddress', providers);
     });
+
+    if (!this.registry || !this.registry.subscribe) {
+      throw new Error('invaled options.registry');
+    }
 
     this.registry.subscribe({
       interfaceName: this.interfaceName
@@ -58,9 +63,9 @@ export class Discoverer extends SDKBase {
     await this.await('update:providers');
   }
 
-  getProviderList(addressList) {
-    return addressList.map(address => {
-      address = decodeURIComponent(address);
+  static getProviderList(addressList) {
+    return addressList.map(addr => {
+      const address = decodeURIComponent(escape(addr));
       const { protocol, hostname, port, query } = URL.parse(address);
       const meta = querystring.parse(query);
 
@@ -73,21 +78,26 @@ export class Discoverer extends SDKBase {
     });
   }
 
-  checkMethods(providerMetaList) {
-    if (!this.methods || this.methods.length === 0) {
+  static checkMethods(providerMetaList, methods) {
+    if (!methods || methods.length === 0) {
       return providerMetaList;
     }
 
     return providerMetaList.filter(({ meta }) => {
-      const methods = (meta.methods || '').split(',');
-      return this.methods.every(method => {
-        return methods.includes(method);
+      const METHODS = (meta.methods || '').split(',');
+      return methods.every(method => {
+        return METHODS.includes(method);
       });
     });
   }
 
   filterProvider(providerMetaList) {
-    return providerMetaList.filter(({ meta, protocol }) => {
+    return providerMetaList.filter(({
+      meta = {
+        version: '',
+        group: ''
+      }, protocol
+    }) => {
       const version = meta.version ? meta.version : meta['default.version'];
       const group = meta.group ? meta.group : meta['default.group'];
 

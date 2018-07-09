@@ -1,0 +1,14 @@
+{
+  "presets": [
+    "babel-preset-env",
+    "es2017",
+    "typescript"
+  ],
+  "env": {
+    "test": {
+      "plugins": [
+        "istanbul"
+      ]
+    }
+  }
+}

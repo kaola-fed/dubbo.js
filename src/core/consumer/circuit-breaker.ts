@@ -3,14 +3,20 @@ enum states {
     Opend,
     HalfOpened,
 }
+const TIMEOUT = 10 * 1000;
+const LIMIT = 10;
 
 export class CircuitBreaker {
-    timeout = 10 * 1000;
-    limit = 10;
+    timeout = TIMEOUT;
+    limit = LIMIT;
     succCount = 0;
     failedCount = 0;
     state = states.Closed;
     options;
+
+    constructor(options?) {
+      this.options = options || {};
+    }
 
     get meta() {
       return this.options.meta || {};
@@ -28,10 +34,6 @@ export class CircuitBreaker {
       return this.state === states.HalfOpened;
     }
 
-    constructor(options?) {
-      this.options = options || {};
-    }
-
     succ() {
       this.succCount++;
       this.failedCount = 0;
@@ -44,6 +46,7 @@ export class CircuitBreaker {
     }
 
     failed() {
+      let self = this;
       this.failedCount++;
       this.succCount = 0;
 
@@ -51,7 +54,7 @@ export class CircuitBreaker {
         this.state = states.Opend;
 
         setTimeout(function() {
-          this.state = states.HalfOpened;
+          self.state = states.HalfOpened;
         }, this.timeout);
       }
     }

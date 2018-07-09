@@ -2,7 +2,7 @@ import { logger } from './../tools/logger';
 import { ZKClientOptions } from './interface/zk-client-options';
 import { ZKClient } from './../core/registry/index';
 import { APIClientBase } from 'cluster-client';
-
+import pTimeout from 'p-timeout';
 
 export class RegistryAPIClient extends APIClientBase {
     _client: ZKClient;
@@ -44,7 +44,12 @@ export class RegistryAPIClient extends APIClientBase {
     }
 
     async _init() {
-      await this._client.ready();
+      let ready = false;
+      await pTimeout(this._client.ready().then(() => {
+        ready = true;
+      }), 5000, () => {
+        if (!ready) throw new Error('connect zk timeout');
+      });
     }
 }
 

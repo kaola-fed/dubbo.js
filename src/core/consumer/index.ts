@@ -2,10 +2,12 @@ import { InvokeOptions } from './../../interface/invoke-options';
 import { Discoverer } from './discoverer';
 import { ConsumerOptions } from './../../interface/consumer-options';
 import { CircuitBreaker } from './circuit-breaker';
+import { Client, ClientWithPool } from './client';
+import Encoder from '../../tools/encoder';
 import SDKBase from 'sdk-base';
 import assert from 'assert';
 import URL from 'url';
-import { randomLoadBalance, roundRoubinLoadBalance } from './load-balancer';
+import { randomLoadBalance /*roundRoubinLoadBalance*/ } from './load-balancer';
 
 const SERVER_ADDRESS = Symbol('serverAddress');
 enum states {
@@ -30,6 +32,8 @@ class AllCircuitBreakersOpenedError extends Error {
 }
 
 export class Consumer extends SDKBase {
+    _client;
+    _encoder: Encoder;
     options: ConsumerOptions;
     discoverer: Discoverer;
     [SERVER_ADDRESS] = [];
@@ -61,25 +65,54 @@ export class Consumer extends SDKBase {
 
     serverAddressList: Array<CircuitBreaker>;
     balancerLoad: Function;
-
+    /*
+      new Consumer({
+        registry,
+        interfaceName: 'com.xxx.yyy',
+        dubboVersion: '2.8.4',
+        version: '1.0.0',
+        group: '',
+        protocol: 'jsonrpc',
+        methods: ['test']
+        timeout: 3000,
+        pool: {
+          min: 2,
+          max: 4,
+          maxWaitingClients: 10,
+          keepAlive: true
+        }
+      });
+    */
     constructor(options) {
       super(Object.assign({}, options, {
         initMethod: '_init',
       }));
+
+      options = Object.assign({}, {
+        dubboVersion: '2.8.0',
+        version: '1.0',
+        protocol: 'dubbo'
+      }, options);
+
+      this._encoder = new Encoder(options);
+
+      this._client = options.pool
+        ? new ClientWithPool(options.pool)
+        : new Client();
 
       this.options = options;
       this.balancerLoad = randomLoadBalance();
       assert(options.registry || options.serverHosts, 'rpcClient.createConsumer(options) 需要指定 options.serverHosts');
     }
 
-    async invoke(method, args, options: InvokeOptions = {}) {
+    async invoke(method, args, headers = [], options: InvokeOptions = {}) {
       if (this.serverAddress.length === 0) {
         throw new NoneProviderError(this);
       }
 
-      const { halfOpened, closed } = CircuitBreaker.group(this.serverAddress);
+      const { halfOpened, closed, opened } = CircuitBreaker.group(this.serverAddress);
 
-      if (closed.length === this.serverAddress.length) {
+      if (opened.length === this.serverAddress.length) {
         throw new AllCircuitBreakersOpenedError(this);
       }
 
@@ -88,7 +121,11 @@ export class Consumer extends SDKBase {
       // 1. protocol.encode
       // 2. 判断是否需要探活，生成对应的 serverAddress
 
-      let item; let state;
+      let item = null;
+
+
+      let state;
+
       if (halfOpened.length > 0 && this.isExploreTraffic() && options.retry === 1) {
         // 探活流量
         item = this.balancerLoad(halfOpened, 'halfOpened');
@@ -99,17 +136,41 @@ export class Consumer extends SDKBase {
         state = states.normal;
       }
 
-      // 3. Socket Pool 代理 socket 复用
-      // 4.1 返回成功
-      // 4.1.1 protocol.decode
-      // 4.1.2 解析上下文信息
-      // 4.1.3 CircuitBreaker.succ
-      // 4.2 失败
-      // 4.2.1 未超出 Retry阈值，Retry
-      // 4.2.2 如果超出 Retry 阈值，降级（Mock）
-      // 4.2.3 CircuitBreaker.failed
+      if (!item) {
+        return options.mock || 'remote service is unreachable';
+      }
 
-      return;
+      // 3. Socket Pool 代理 socket 复用
+      const { hostname, port } = item.meta;
+      // 构造jsonRpc POST请求头
+      if (this.options.protocol.toLowerCase() === 'jsonrpc') {
+        headers.unshift(`POST /${this.options.interfaceName} HTTP/1.1`, `HOST: ${hostname}:${port}`);
+      }
+
+      const buffer = this._encoder.encode(method, args, headers);
+
+      return this._client.request(hostname, port, buffer, this.options.protocol)
+        .then((res) => {
+        // 4.1 返回成功
+        // 4.1.1 protocol.decode
+        // 4.1.2 解析上下文信息
+        // 4.1.3 CircuitBreaker.succ
+          item.succ();
+          return res;
+        })
+        .catch(err => {
+        // 4.2 失败
+        // 4.2.1 未超出 Retry阈值，Retry
+        // 4.2.2 如果超出 Retry 阈值，降级（Mock）
+        // 4.2.3 CircuitBreaker.failed
+          console.error(err);
+          item.failed();
+          if (options.retry > 0) {
+            options.retry = options.retry - 1;
+            return this.invoke(method, args, headers, options);
+          }
+          return options.mock || 'remote service is unreachable';
+        });
     }
 
     isExploreTraffic() {
