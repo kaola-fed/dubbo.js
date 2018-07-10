@@ -8,7 +8,6 @@ import {
   delegate
 } from './delegate';
 
-
 export class SocketError extends Error {
   constructor(message, err) {
     super(message);
@@ -31,6 +30,7 @@ export default class Pool {
 
   emit: Function;
   destroy: Function;
+  clear: Function;
 
   constructor({
     // options of generic-pool
@@ -95,6 +95,7 @@ delegate(Pool, '_pool', [
   'emit',
   'once',
   'drain',
+  'clear',
   'destroy',
   'release'
 ]);

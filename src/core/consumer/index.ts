@@ -203,4 +203,8 @@ export class Consumer extends SDKBase {
     direct() {
       this.serverAddress = this.options.serverHosts.map(item => URL.parse(item));
     }
+
+    async close() {
+      await this._client._close();
+    }
 }

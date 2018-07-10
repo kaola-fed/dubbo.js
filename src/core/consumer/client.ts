@@ -94,6 +94,10 @@ class RequestBase {
         socket.on('data', chunk => {
           if (this._protocol.toLowerCase() === 'jsonrpc') {
             // console.log('jsonRpc request done');
+            if (!this._heap) {
+              this._heap = '';
+            }
+
             this._heap += chunk.toString();
 
             // TODO: 现在只处理了jsonrpc有content-length的返回，对trunk的返回结果未解析
@@ -167,6 +171,10 @@ class ClientBase {
     throws('_socket');
   }
 
+  async _close() {
+    throws('_close');
+  }
+
   request(host, port, buffer, protocol) {
     return Promise.resolve(this._socket(host, port))
       .then(socket =>
@@ -183,12 +191,20 @@ class ClientBase {
 
 // With normal single-use socket
 export class Client extends ClientBase {
+  _client = null;
   constructor() {
     super(Request);
   }
 
   _socket() {
-    return new net.Socket();
+    this._client = new net.Socket();
+    return this._client;
+  }
+
+  async _close() {
+    if (this._client) {
+      this._client.destroy();
+    }
   }
 }
 
@@ -218,6 +234,17 @@ export class ClientWithPool extends ClientBase {
       return this._pools[key];
     }
 
+    async _close() {
+      for (let key in this._pools) {
+        if ({}.hasOwnProperty.call(this._pools, key)) {
+          let pool = this._pools[key];
+
+          if (pool) {
+            await pool.drain().then(() => pool.clear());
+          }
+        }
+      }
+    }
   // Acquire the socket connection from the pool
     _socket(host, port) {
       const pool = this._getPool(host, Number(port));

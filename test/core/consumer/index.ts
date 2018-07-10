@@ -41,6 +41,8 @@ describe('test/core/consumer/index.ts', () => {
         await consumer.invoke('test', [], []).catch(e => {
             assert.throws(function() { throw e; }, /不存在可用服务提供方/);
         });
+
+        await consumer.close();
     });
 
     it ('new ConsumerDataClient({registry})', async () => {
@@ -48,6 +50,7 @@ describe('test/core/consumer/index.ts', () => {
             registry: registry,
             interfaceName: 'com.netease.haitao.message.service.MessageFatigueServiceFacade'
         });
+
         await consumer.ready();
     });
 
@@ -100,8 +103,7 @@ describe('test/core/consumer/index.ts', () => {
         assert.equal(res, 'remote service is unreachable');
     });
 
-    it('invoke a method okay', async () => {
-        
+    it('invoke a jsonrpc method okay', async () => {
         consumer = new Consumer({
             registry: null,
             interfaceName: conf.jsonPath,
@@ -131,9 +133,39 @@ describe('test/core/consumer/index.ts', () => {
         }, ['Dubbo-Attachments: k1=aa,k2=bb,k3=123'], {
             retry: 1
         });
+
         assert.deepEqual(res, { code: '200',
         body: { jsonrpc: '2.0', id: 1, result: 'aa from 10.165.205.234:9092' } });
+
+        await consumer.close();
     });
+
+    it('invoke a dubbo method okay', async () => {
+        consumer = new Consumer({
+            dubboVersion: '3.0.6-SNAPSHOT',
+            version: '',
+            group: 'performance',
+            protocol: 'dubbo',
+            timeout: 3000,
+            pool: null,
+            registry: null,
+            interfaceName: conf.dubboPath,
+            methods: ['getUser', 'registerUser'],
+            serverHosts: [conf.actualDubbo],
+            check: false
+        });
+
+        await consumer.ready();
+        const res = await consumer.invoke('getUser', [{
+            $class: 'java.lang.Long',
+            $: 2
+        }], [], {
+            retry: 3
+        });
+        
+        assert.deepEqual(res, { id: 2, name: 'username2' });
+        await consumer.close();
+    });    
 
     after(async function() {
         await registry.close();

@@ -40,7 +40,7 @@ export default class Socket {
         return waitForConnected;
       }
 
-      return pTimeout(waitForConnected, timeout, '');
+      return pTimeout(waitForConnected, timeout, 'TimeoutError');
     }
 
     _connect(config) {
