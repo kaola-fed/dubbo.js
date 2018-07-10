@@ -5,6 +5,7 @@
     "@types/assert": "^0.0.31",
     "@types/mocha": "^5.2.3",
     "@types/node": "^10.3.5",
+    "babel-eslint": "^8.2.5",
     "chai": "^4.1.2",
     "coveralls": "^3.0.2",
     "cross-env": "^5.2.0",

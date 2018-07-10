@@ -35,6 +35,11 @@ describe('test/core/consumer/discoverer.ts', () => {
         }
     };
 
+    it ('should throw invaled options.registry error', async () => {
+        new Discoverer(Object.assign({}, options, {registry: null}));
+        new Discoverer(Object.assign({}, options, {registry: {host: '1.1.1.1'}})); 
+    });
+
     it ('new Discoverer(options)', async () => {
         discoverer = new Discoverer(options);
         await new Promise((resolve) => {
