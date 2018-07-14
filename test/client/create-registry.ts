@@ -14,6 +14,9 @@ describe('test/client/create-registry-client.ts', () => {
         await client.ready();
     });
 
+    it('client logger is console', () => {
+        assert.equal(client.logger, console);
+    });
 
     it('await subscribe', async () => {
         const res = await new Promise(function(resolve) {
