@@ -35,15 +35,15 @@
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ImHype/dubbo.js.git"
+    "url": "git+https://github.com/kaola-fed/dubbo.js.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ImHype/dubbo.js/issues"
+    "url": "https://github.com/kaola-fed/dubbo.js/issues"
   },
-  "homepage": "https://github.com/ImHype/dubbo.js#readme",
+  "homepage": "https://github.com/kaola-fed/dubbo.js#readme",
   "dependencies": {
     "address": "^1.0.3",
     "assert": "^1.4.1",
