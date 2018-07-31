@@ -8,7 +8,7 @@ import { createRpcClient, createConsumer, createRegistry } from 'dubbo.js';
 async function launch() {
     const registry = createRegistry({
         logger: console,
-        zkHosts: '10.170.164.121:2181'
+        zkHosts: '127.0.0.1:2181'
     });
 
     await registry.ready();
@@ -30,7 +30,7 @@ import { createConsumer, createRegistry } from 'dubbo.js';
 async function launch() {
     const registry = createRegistry({
         logger: console,
-        zkHosts: '10.170.164.121:2181'
+        zkHosts: '127.0.0.1:2181'
     });
 
     await registry.ready();
@@ -53,7 +53,7 @@ import { createRpcClient, createRegistry } from 'dubbo.js';
 async function launch() {
     const registry = createRegistry({
         logger: console,
-        zkHosts: '10.170.164.121:2181'
+        zkHosts: '127.0.0.1:2181'
     });
 
     await registry.ready();

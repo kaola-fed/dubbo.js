@@ -1,20 +1,25 @@
 {
   "name": "dubbo.js",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "devDependencies": {
     "@types/assert": "^0.0.31",
     "@types/mocha": "^5.2.3",
     "@types/node": "^10.3.5",
+    "@types/rewire": "^2.5.28",
     "babel-eslint": "^8.2.5",
     "chai": "^4.1.2",
+    "commitizen": "^2.10.1",
+    "conventional-changelog": "^2.0.1",
     "coveralls": "^3.0.2",
     "cross-env": "^5.2.0",
+    "cz-conventional-changelog": "^2.1.0",
     "eslint": "^5.0.0",
     "eslint-config-alloy": "^1.4.2",
     "eslint-plugin-typescript": "^0.12.0",
     "husky": "^1.0.0-rc.9",
     "mocha": "^5.2.0",
     "nyc": "^12.0.2",
+    "rewire": "^4.0.1",
     "sinon": "^6.1.0",
     "source-map-support": "^0.5.6",
     "ts-node": "^7.0.0",
@@ -29,21 +34,28 @@
     "test": "TS_NODE_PROJECT=./tsconfig.json mocha test/*/*.ts test/*/*/*.ts",
     "cover": "TS_NODE_PROJECT=./tsconfig.json nyc mocha test/*/*.ts test/*/*/*.ts && nyc report --reporter=html",
     "lint": "eslint src --ext .ts",
-    "publish:next": "npm publish --tag next"
+    "publish:next": "npm publish --tag next",
+    "prepare": "commitizen init cz-conventional-changelog --save --save-exact && npm run build",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
+    "addChangelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
   },
   "description": "",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ImHype/dubbo.js.git"
+    "url": "git+https://github.com/kaola-fed/dubbo.js.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ImHype/dubbo.js/issues"
+    "url": "https://github.com/kaola-fed/dubbo.js/issues"
   },
-  "homepage": "https://github.com/ImHype/dubbo.js#readme",
+  "files": [
+    "dist/",
+    "example/"
+  ],
+  "homepage": "https://github.com/kaola-fed/dubbo.js#readme",
   "dependencies": {
     "address": "^1.0.3",
     "assert": "^1.4.1",
@@ -81,6 +93,11 @@
       ],
       "sourceMap": true,
       "instrument": true
+    }
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
     }
   }
 }

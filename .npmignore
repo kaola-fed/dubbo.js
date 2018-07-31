@@ -1,0 +1,5 @@
+*.ts
+src/
+test/
+.github/
+.DS_Store
