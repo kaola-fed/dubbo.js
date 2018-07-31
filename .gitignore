@@ -60,4 +60,8 @@ typings/
 # next.js build output
 .next
 
+# build path
 dist
+
+# example config
+example/config.js

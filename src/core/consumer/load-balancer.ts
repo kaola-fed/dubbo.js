@@ -4,29 +4,27 @@ export function randomLoadBalance() {
   };
 }
 
-export function roundRoubinLoadBalance() {
+export function roundRoubinLoadBalance(l) {
   const lastItemMap = new Map();
+  const list = l;
 
-  return function(list, mode) {
+  return function(mode = 'defualt') {
+    if (!list) return '';
+
     let last = lastItemMap.get(mode);
-    let current;
 
-    if (!last) {
-      current = list[0];
+    if (!last && last !== 0) {
+      last = 0;
     } else {
-      let index = list.indexOf(last);
-
-      if (index < list.length) {
-        index++;
+      if (last < list.length - 1) {
+        last++;
       } else {
-        index = 0;
+        last = 0;
       }
-
-      current = list[current];
     }
 
-    lastItemMap.set(mode, current);
+    lastItemMap.set(mode, last);
 
-    return current;
+    return list[last];
   };
 }

@@ -1,10 +1,10 @@
 import { ConsumerOptions } from './../interface/consumer-options';
 import { Consumer } from './../core/consumer/index';
-import { APIClientBase } from 'cluster-client';
+//import { APIClientBase } from 'cluster-client';
 import { logger } from './../tools/logger';
-import { RpcClientOptions } from './interface/rpc-client-options';
+//import { RpcClientOptions } from './interface/rpc-client-options';
 import SDKBase from 'sdk-base';
-import pify from 'pify';
+//import pify from 'pify';
 import assert from 'assert';
 
 export class RpcClient extends SDKBase {
@@ -27,9 +27,12 @@ export class RpcClient extends SDKBase {
 
 
   createConsumer(options: ConsumerOptions) {
-    return new Consumer(options);
+    return new Consumer(Object.assign({}, this.options, options));
   }
 
+  async _init() {
+    return;
+  }
 }
 
 export default function createRpcClient(options) {

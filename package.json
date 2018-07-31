@@ -1,15 +1,22 @@
 {
   "name": "dubbo.js",
-  "version": "0.2.0-next-7836121b",
+  "version": "0.2.0",
   "devDependencies": {
     "@types/assert": "^0.0.31",
     "@types/mocha": "^5.2.3",
     "@types/node": "^10.3.5",
-    "babel-eslint": "^8.2.4",
+    "babel-eslint": "^8.2.5",
+    "chai": "^4.1.2",
+    "coveralls": "^3.0.2",
+    "cross-env": "^5.2.0",
     "eslint": "^5.0.0",
     "eslint-config-alloy": "^1.4.2",
     "eslint-plugin-typescript": "^0.12.0",
     "husky": "^1.0.0-rc.9",
+    "mocha": "^5.2.0",
+    "nyc": "^12.0.2",
+    "sinon": "^6.1.0",
+    "source-map-support": "^0.5.6",
     "ts-node": "^7.0.0",
     "tsconfig-paths": "^3.4.0",
     "typescript": "^2.9.2",
@@ -19,7 +26,8 @@
     "tsn": "ts-node",
     "dev": "npm run build -- --watch",
     "build": "tsc",
-    "test": "TS_NODE_PROJECT=./tsconfig.json mocha --require ts-node/register --require tsconfig-paths/register --watch-extensions ts test/*/*.ts",
+    "test": "TS_NODE_PROJECT=./tsconfig.json mocha test/*/*.ts test/*/*/*.ts",
+    "cover": "TS_NODE_PROJECT=./tsconfig.json nyc mocha test/*/*.ts test/*/*/*.ts && nyc report --reporter=html",
     "lint": "eslint src --ext .ts",
     "publish:next": "npm publish --tag next"
   },
@@ -37,8 +45,13 @@
   },
   "homepage": "https://github.com/ImHype/dubbo.js#readme",
   "dependencies": {
+    "address": "^1.0.3",
     "assert": "^1.4.1",
     "cluster-client": "^2.1.1",
+    "generic-pool": "^3.4.2",
+    "hessian.js": "^2.8.1",
+    "once": "^1.4.0",
+    "p-timeout": "^2.0.1",
     "sdk-base": "^3.4.0",
     "zookeeper-cluster-client": "^2.0.1"
   },
@@ -46,6 +59,28 @@
     "hooks": {
       "pre-commit": "npm run lint -- --fix; git add -A",
       "pre-push": "npm test"
+    }
+  },
+  "nyc": {
+    "nyc": {
+      "include": [
+        "test/*/*.ts",
+        "test/*/*/*.ts"
+      ],
+      "extension": [
+        ".ts",
+        ".tsx"
+      ],
+      "require": [
+        "ts-node/register"
+      ],
+      "reporter": [
+        "lcov",
+        "text-summary",
+        "html"
+      ],
+      "sourceMap": true,
+      "instrument": true
     }
   }
 }

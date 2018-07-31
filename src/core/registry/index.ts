@@ -97,7 +97,6 @@ export class ZKClient extends SDKBase {
     async subscribe(options, listener) {
       const { interfaceName } = options;
       this.on(interfaceName, listener);
-
       if (!this._subscribeMap.has(interfaceName)) {
         this._subscribeMap.set(interfaceName, null);
 
