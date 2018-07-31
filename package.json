@@ -1,6 +1,6 @@
 {
   "name": "dubbo.js",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "devDependencies": {
     "@types/assert": "^0.0.31",
     "@types/mocha": "^5.2.3",
@@ -35,7 +35,7 @@
     "cover": "TS_NODE_PROJECT=./tsconfig.json nyc mocha test/*/*.ts test/*/*/*.ts && nyc report --reporter=html",
     "lint": "eslint src --ext .ts",
     "publish:next": "npm publish --tag next",
-    "prepare": "commitizen init cz-conventional-changelog --save --save-exact && npm run build",
+    "prepare": "rm -rf lib/* && npm run build",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "addChangelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
   },
@@ -51,10 +51,6 @@
   "bugs": {
     "url": "https://github.com/kaola-fed/dubbo.js/issues"
   },
-  "files": [
-    "dist/",
-    "example/"
-  ],
   "homepage": "https://github.com/kaola-fed/dubbo.js#readme",
   "dependencies": {
     "address": "^1.0.3",
