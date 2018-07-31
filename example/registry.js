@@ -1,11 +1,11 @@
 const conf = require('./config');
 const { createRegistry, createRpcClient } = require('../dist');
 
-const sleep = async (time) => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(), time);
-  });
-};
+// const sleep = async (time) => {
+//   return new Promise((resolve) => {
+//     setTimeout(() => resolve(), time);
+//   });
+// };
 
 async function launch() {
   const registry = createRegistry({
