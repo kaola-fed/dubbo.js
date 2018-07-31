@@ -10,6 +10,10 @@ const DEFAULT_BUFFER_LENGTH = 16;
 const SOCKET_ERROR = 'SOCKET_ERROR';
 const SOCKET_CLOSE_ERROR = 'SOCKET_CLOSE_ERROR';
 
+/**
+ *
+ * @param chunk
+ */
 const extraLength = chunk => {
   const arr = Array.prototype.slice.call(chunk.slice(0, 16));
   let i = 0;
@@ -174,7 +178,13 @@ class ClientBase {
   async _close() {
     throws('_close');
   }
-
+  /**
+   * send a request
+   * @param host
+   * @param port
+   * @param buffer
+   * @param protocol
+   */
   request(host, port, buffer, protocol) {
     return Promise.resolve(this._socket(host, port))
       .then(socket =>
@@ -218,6 +228,11 @@ export class ClientWithPool extends ClientBase {
       this._pool = pool;
     }
 
+    /**
+     *
+     * @param host
+     * @param port
+     */
     _getPool(host, port) {
       const key = `${host}:${port}`;
 
@@ -245,7 +260,11 @@ export class ClientWithPool extends ClientBase {
         }
       }
     }
-  // Acquire the socket connection from the pool
+  /**
+   * Acquire the socket connection from the pool
+   * @param host
+   * @param port
+   */
     _socket(host, port) {
       const pool = this._getPool(host, Number(port));
       return pool.acquire();

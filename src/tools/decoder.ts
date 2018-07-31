@@ -4,7 +4,11 @@ const RESPONSE_OK             = 20;
 const RESPONSE_WITH_EXCEPTION = 0;
 const RESPONSE_VALUE          = 1;
 const RESPONSE_NULL_VALUE     = 2;
-
+/**
+ * 解码接收到的服务端信息
+ * @param income
+ * @param protocol
+ */
 export default function decode(income, protocol) {
   let heap = income;
   if (protocol.toLowerCase() === 'jsonrpc') {

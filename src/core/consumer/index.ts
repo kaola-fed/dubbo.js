@@ -123,7 +123,6 @@ export class Consumer extends SDKBase {
 
       let item = null;
 
-
       //let state;
 
       if (halfOpened.length > 0 && this.isExploreTraffic() && options.retry === 1) {

@@ -81,7 +81,12 @@ export default class Encoder {
         $: implicitArgs
       };
     }
-
+    /**
+     * 构造请求体，编码请求头及请求消息体
+     * @param method
+     * @param args
+     * @param headers
+     */
     encode(method, args, headers) {
       if (this._protocol === 'dubbo') {
         const body = this._body(method, args);
@@ -164,46 +169,5 @@ export default class Encoder {
       let byteBuffer = encoder.byteBuffer;
       byteBuffer = byteBuffer.get(0, encoder.byteBuffer._offset);
       return byteBuffer;
-      /*
-        body.write(this._dubboVersion);
-        body.write(this._interface);
-        body.write(this._version);
-        body.write(method);
-
-        if (this._gte280) {
-            body.write(-1);
-        }
-
-        body.write(this._argsType(args));
-        args.forEach(arg => {
-            body.write(arg);
-        });
-
-        body.write(this._attachments);
-
-        return body.byteBuffer._bytes.slice(0, body.byteBuffer._offset);
-        */
     }
-
-    /*_argsType (args) {
-        if (!args.length) {
-            return '';
-        }
-
-        let ret = '';
-
-        args.forEach(arg => {
-            const type = arg.$class;
-
-            ret += type.charAt(0) === '['
-                ? ~type.indexOf('.')
-                ? '[L' + type.slice(1).replace(/\./gi, '/') + ';'
-                : '[' + ENUM_TYPE[type.slice(1)]
-                : type && ~type.indexOf('.')
-                ? 'L' + type.replace(/\./gi, '/') + ';'
-                : ENUM_TYPE[type];
-        });
-
-        return ret;
-    }*/
 }

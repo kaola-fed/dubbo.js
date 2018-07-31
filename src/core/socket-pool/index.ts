@@ -65,7 +65,10 @@ export default class Pool {
       }
     }, pool);
   }
-
+  /**
+   * get a free available socket
+   * @param priority
+   */
   acquire(priority) {
     return this._pool.acquire(priority)
       .then(socket => {

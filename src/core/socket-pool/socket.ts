@@ -26,7 +26,11 @@ export default class Socket {
 
       this._socket.once('end', () => this.destroy());
     }
-
+    /**
+     *
+     * @param config
+     * @param timeout
+     */
     connect(config, timeout) {
       if (this._connected) {
         return Promise.resolve(this);
