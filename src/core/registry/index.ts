@@ -42,7 +42,9 @@ export class ZKClient extends SDKBase {
 
       assert(options.zkHosts, '请传入 zkHosts');
 
-      this._zkClient = this.options.zookeeper.createClient(this.zkHosts);
+      const zkClusterOptions = options.cluster ? { cluster: options.cluster } : {};
+
+      this._zkClient = this.options.zookeeper.createClient(this.zkHosts, zkClusterOptions);
     }
 
     async _init() {
