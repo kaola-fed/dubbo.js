@@ -61,7 +61,7 @@ export default class Encoder {
       this._gte280 = gte(dubboVersion, '2.8.0');
 
       const implicitArgs = {
-        interfaceName: _interface,
+        interface: _interface,
         path: _interface,
         timeout,
         version,
@@ -136,7 +136,7 @@ export default class Encoder {
       const encoder = new EncoderV2();
 
       encoder.write(this._dubboVersion);
-      encoder.write(this._group + '/' + this._interface);
+      encoder.write(this._interface);
       encoder.write(this._version);
       encoder.write(method);
 
