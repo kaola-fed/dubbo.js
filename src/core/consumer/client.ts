@@ -1,6 +1,6 @@
 // Socket client with connection pool
 import net from 'net';
-
+import pTimeout from 'p-timeout';
 import Pool from '../socket-pool';
 import once from 'once';
 
@@ -185,8 +185,8 @@ class ClientBase {
    * @param buffer
    * @param protocol
    */
-  request(host, port, buffer, protocol) {
-    return Promise.resolve(this._socket(host, port))
+  request(host, port, buffer, protocol, timeout = 5000) {
+    return pTimeout(Promise.resolve(this._socket(host, port))
       .then(socket =>
         new this._Request({
           socket,
@@ -194,8 +194,8 @@ class ClientBase {
           port,
           buffer,
           protocol
-        }).start()
-      );
+        }).start())
+      , timeout);
   }
 }
 
