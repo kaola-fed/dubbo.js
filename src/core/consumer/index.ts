@@ -26,7 +26,7 @@ class NoneProviderError extends Error {
 class AllCircuitBreakersOpenedError extends Error {
   constructor(consumer) {
     super();
-    this.name = 'NoneProviderError';
+    this.name = 'AllCircuitBreakersOpenedError';
     this.message = `Consumer - {interfaceName: ${consumer.interfaceName}, group: ${consumer.group || ''}, version: ${consumer.version || ''}} 所有的服务提供方都被熔断了`;
   }
 }
@@ -48,6 +48,18 @@ export class Consumer extends SDKBase {
 
     get serverAddress() {
       return this[SERVER_ADDRESS];
+    }
+
+    get group() {
+      return this.options.group;
+    }
+
+    get version() {
+      return this.options.version;
+    }
+
+    get interfaceName() {
+      return this.options.interfaceName;
     }
 
     set serverAddress(serverAddress) {
@@ -107,13 +119,25 @@ export class Consumer extends SDKBase {
 
     async invoke(method, args, headers = [], options: InvokeOptions = {}) {
       if (this.serverAddress.length === 0) {
-        throw new NoneProviderError(this);
+        let noneError = new NoneProviderError(this);
+
+        if (options.mock) {
+          console.error(noneError);
+          return options.mock;
+        }
+        throw noneError;
       }
 
       const { halfOpened, closed, opened } = CircuitBreaker.group(this.serverAddress);
 
       if (opened.length === this.serverAddress.length) {
-        throw new AllCircuitBreakersOpenedError(this);
+        let allBreakError = new AllCircuitBreakersOpenedError(this);
+
+        if (options.mock) {
+          console.error(allBreakError);
+          return options.mock;
+        }
+        throw allBreakError;
       }
 
       // @TODO

@@ -32,7 +32,7 @@ export default class Socket {
      * @param timeout
      */
     connect(config, timeout) {
-      if (this._connected) {
+      if (this._connected && this._socket.readable) {
         return Promise.resolve(this);
       }
 
