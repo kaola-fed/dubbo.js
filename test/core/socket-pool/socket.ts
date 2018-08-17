@@ -22,6 +22,7 @@ describe('test/core/socket-pool/socket.ts', () => {
 
     it('return socket when connected', async () => {
         socket._connected = true;
+        socket._socket.readable = true;
         let client =  await socket.connect({
             path: '/',
             timeout: -1
