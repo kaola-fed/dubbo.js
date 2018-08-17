@@ -41,7 +41,7 @@ describe('test/core/socket-pool/index.ts', () => {
 
     it('await pool.acquire SocketError', async () => {
         await timeoutPool.acquire().catch(e => {
-            assert.throws(function() { throw e; }, /TimeoutError: socket fails to connect to server/);
+            assert.throws(function() { throw e; }, /TimeoutError: acquire a socket fails to connect to server/);
         });
     });
 
