@@ -2,6 +2,11 @@
 ## [0.2.8](https://github.com/kaola-fed/dubbo.js/compare/v0.2.7...v0.2.8) (2018-08-21)
 
 
+### Features
+
+* 微调jsonrpc协议下 msgId的传参方式 ([816df4c](https://github.com/kaola-fed/dubbo.js/commit/816df4c))
+
+
 
 <a name="0.2.7"></a>
 ## [0.2.7](https://github.com/kaola-fed/dubbo.js/compare/v0.2.6...v0.2.7) (2018-08-21)
