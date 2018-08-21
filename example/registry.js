@@ -81,7 +81,8 @@ async function launch() {
 
     await consumer.ready();
     const res = await consumer.invoke('findAttachments', ['k1'], ['Dubbo-Attachments: k1=aa,k2=bb,k3=123'], {
-      retry: 1
+      retry: 1,
+      rpcMsgId: 2
     });
     console.log(res);
     // await sleep(500);

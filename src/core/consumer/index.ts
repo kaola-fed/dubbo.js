@@ -66,10 +66,6 @@ export class Consumer extends SDKBase {
       return this.options.jsonRpcVersion;
     }
 
-    get rpcMsgId() {
-      return this.options.rpcMsgId;
-    }
-
     set serverAddress(serverAddress) {
       this[SERVER_ADDRESS] = serverAddress
         .map(
@@ -111,7 +107,6 @@ export class Consumer extends SDKBase {
       let options = Object.assign({}, {
         dubboVersion: '2.8.0',
         jsonRpcVersion: '2.0',
-        rpcMsgId: 1,
         version: '1.0',
         protocol: 'dubbo'
       }, opts);
@@ -127,7 +122,7 @@ export class Consumer extends SDKBase {
       assert(options.registry || options.serverHosts, 'rpcClient.createConsumer(options) 需要指定 options.serverHosts');
     }
 
-    async invoke(method, args, headers = [], options: InvokeOptions = {}) {
+    async invoke(method, args, headers = [], options: InvokeOptions = { rpcMsgId: 1 }) {
       if (this.serverAddress.length === 0) {
         let noneError = new NoneProviderError(this);
 
@@ -184,7 +179,7 @@ export class Consumer extends SDKBase {
           jsonrpc: this.jsonRpcVersion || '2.0',
           method,
           params: args,
-          id: this.rpcMsgId || 1
+          id: options.rpcMsgId || 1
         };
       }
 

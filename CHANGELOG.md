@@ -1,11 +1,33 @@
-<a name="0.2.1"></a>
-## 0.2.1 (2018-07-31)
+<a name="0.2.8"></a>
+## [0.2.8](https://github.com/kaola-fed/dubbo.js/compare/v0.2.7...v0.2.8) (2018-08-21)
+
+
+
+<a name="0.2.7"></a>
+## [0.2.7](https://github.com/kaola-fed/dubbo.js/compare/v0.2.6...v0.2.7) (2018-08-21)
+
+
+### Bug Fixes
+
+* fix lint problem ([6a1e0b2](https://github.com/kaola-fed/dubbo.js/commit/6a1e0b2))
+
+
+### Features
+
+* 改变jsonRpc协议下的调用方式 ([b18618b](https://github.com/kaola-fed/dubbo.js/commit/b18618b))
+
+
+
+<a name="0.2.6"></a>
+## [0.2.6](https://github.com/kaola-fed/dubbo.js/compare/4035b6f...v0.2.6) (2018-08-17)
 
 
 ### Bug Fixes
 
 * test error ([cadc074](https://github.com/kaola-fed/dubbo.js/commit/cadc074))
 * 确实函数执行 ([401c62d](https://github.com/kaola-fed/dubbo.js/commit/401c62d))
+* **encoder:** fix encoder interfaceName ([a3cc14b](https://github.com/kaola-fed/dubbo.js/commit/a3cc14b))
+* **npmignore .ts:** npmignore .ts files ([b01e8d7](https://github.com/kaola-fed/dubbo.js/commit/b01e8d7))
 
 
 ### Features
