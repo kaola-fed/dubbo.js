@@ -175,10 +175,12 @@ export class Consumer extends SDKBase {
 
       // 3. Socket Pool 代理 socket 复用
       const { hostname, port } = item.meta;
+      let encodeArgs = args;
+
       // 构造jsonRpc POST请求头
       if (this.options.protocol.toLowerCase() === 'jsonrpc') {
         headers.unshift(`POST /${this.options.interfaceName} HTTP/1.1`, `HOST: ${hostname}:${port}`);
-        args = {
+        encodeArgs = {
           jsonrpc: this.jsonRpcVersion || '2.0',
           method,
           params: args,
@@ -186,7 +188,7 @@ export class Consumer extends SDKBase {
         };
       }
 
-      const buffer = this._encoder.encode(method, args, headers);
+      const buffer = this._encoder.encode(method, encodeArgs, headers);
 
       return this._client.request(hostname, port, buffer, this.options.protocol, options.timeout)
         .then((res) => {
