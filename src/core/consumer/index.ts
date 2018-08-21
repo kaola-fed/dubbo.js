@@ -62,6 +62,14 @@ export class Consumer extends SDKBase {
       return this.options.interfaceName;
     }
 
+    get jsonRpcVersion() {
+      return this.options.jsonRpcVersion;
+    }
+
+    get rpcMsgId() {
+      return this.options.rpcMsgId;
+    }
+
     set serverAddress(serverAddress) {
       this[SERVER_ADDRESS] = serverAddress
         .map(
@@ -81,7 +89,7 @@ export class Consumer extends SDKBase {
       new Consumer({
         registry,
         interfaceName: 'com.xxx.yyy',
-        dubboVersion: '2.8.4',
+        dubboVersion: '2.8.4', // jsonRpcVersion: '2.0',
         version: '1.0.0',
         group: '',
         protocol: 'jsonrpc',
@@ -102,6 +110,8 @@ export class Consumer extends SDKBase {
 
       let options = Object.assign({}, {
         dubboVersion: '2.8.0',
+        jsonRpcVersion: '2.0',
+        rpcMsgId: 1,
         version: '1.0',
         protocol: 'dubbo'
       }, opts);
@@ -168,6 +178,12 @@ export class Consumer extends SDKBase {
       // 构造jsonRpc POST请求头
       if (this.options.protocol.toLowerCase() === 'jsonrpc') {
         headers.unshift(`POST /${this.options.interfaceName} HTTP/1.1`, `HOST: ${hostname}:${port}`);
+        args = {
+          jsonrpc: this.jsonRpcVersion || '2.0',
+          method,
+          params: args,
+          id: this.rpcMsgId || 1
+        };
       }
 
       const buffer = this._encoder.encode(method, args, headers);

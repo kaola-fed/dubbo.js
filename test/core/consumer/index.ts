@@ -125,12 +125,7 @@ describe('test/core/consumer/index.ts', () => {
 
 
         await consumer.ready();
-        const res = await consumer.invoke('findAttachments', {
-            jsonrpc: '2.0',
-            method: 'findAttachments',
-            params: ['k1'],
-            id: 1
-        }, ['Dubbo-Attachments: k1=aa,k2=bb,k3=123'], {
+        const res = await consumer.invoke('findAttachments', ['k1'], ['Dubbo-Attachments: k1=aa,k2=bb,k3=123'], {
             retry: 1
         });
 
