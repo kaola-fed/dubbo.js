@@ -1,3 +1,18 @@
+<a name="0.2.11"></a>
+## [0.2.11](https://github.com/kaola-fed/dubbo.js/compare/v0.2.10...v0.2.11) (2018-08-22)
+
+
+### Bug Fixes
+
+* jsonrpc 返回消息体buffer拼接中文乱码问题处理 ([2320fd7](https://github.com/kaola-fed/dubbo.js/commit/2320fd7))
+
+
+
+<a name="0.2.10"></a>
+## [0.2.10](https://github.com/kaola-fed/dubbo.js/compare/v0.2.9...v0.2.10) (2018-08-22)
+
+
+
 <a name="0.2.9"></a>
 ## [0.2.9](https://github.com/kaola-fed/dubbo.js/compare/v0.2.8...v0.2.9) (2018-08-22)
 
