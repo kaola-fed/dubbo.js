@@ -3,7 +3,7 @@ import net from 'net';
 import pTimeout from 'p-timeout';
 import Pool from '../socket-pool';
 import once from 'once';
-
+import BufferHelper from 'bufferhelper';
 import decode from '../../tools/decoder';
 
 const DEFAULT_BUFFER_LENGTH = 16;
@@ -31,7 +31,7 @@ const throws = name => {
 };
 
 /**
- * 计算字符串所占的内存字节数，默认使用UTF-8的编码方式计算，也可制定为UTF-16
+ * 计算字符串所占的内存字节数，默认使用UTF-8的编码方式计算
  * UTF-8 是一种可变长度的 Unicode 编码格式，使用一至四个字节为每个字符编码
  *
  * 000000 - 00007F(128个代码)      0zzzzzzz(00-7F)                             一个字节
@@ -47,14 +47,8 @@ const throws = name => {
  */
 const sizeof = (str) => {
   let total = 0;
-
-
   let charCode;
-
-
   let i;
-
-
   let len;
 
   for (i = 0, len = str.length; i < len; i++) {
@@ -130,6 +124,7 @@ class RequestBase {
       return new Promise((resolve, reject) => {
         this._resolve = once(resolve);
         this._reject = once(reject);
+        let bufferHelper = new BufferHelper();
         let bufferLength = DEFAULT_BUFFER_LENGTH;
         const socket = this._socket;
 
@@ -142,12 +137,9 @@ class RequestBase {
         socket.on('data', chunk => {
           if (this._protocol.toLowerCase() === 'jsonrpc') {
             // console.log('jsonRpc request done');
-            if (!this._heap) {
-              this._heap = Buffer.from('');
-            }
+            bufferHelper.concat(chunk);
 
-            this._heap += chunk;
-
+            this._heap = bufferHelper.toBuffer().toString();
             // TODO: 现在只处理了jsonrpc有content-length的返回，对trunk的返回结果未解析
             if (isover(this._heap)) {
               this._done();
