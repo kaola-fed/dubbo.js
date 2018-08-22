@@ -1,4 +1,5 @@
 import { ZKClientOptions } from '../../interface/zk-client-options';
+import { Logger } from './../../interface/logger';
 import SDKBase from 'sdk-base';
 import zookeeper from 'zookeeper-cluster-client';
 import assert from 'assert';

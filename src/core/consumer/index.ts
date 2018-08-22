@@ -1,5 +1,6 @@
 import { InvokeOptions } from './../../interface/invoke-options';
 import { Discoverer } from './discoverer';
+import { RegistryAPIClient } from './../../client/create-registry';
 import { ConsumerOptions } from './../../interface/consumer-options';
 import { CircuitBreaker } from './circuit-breaker';
 import { Client, ClientWithPool } from './client';
@@ -172,9 +173,12 @@ export class Consumer extends SDKBase {
       const { hostname, port } = item.meta;
       let encodeArgs = args;
 
+
+      let queryHeaders = [].concat(headers);
+
       // 构造jsonRpc POST请求头
       if (this.options.protocol.toLowerCase() === 'jsonrpc') {
-        headers.unshift(`POST /${this.options.interfaceName} HTTP/1.1`, `HOST: ${hostname}:${port}`);
+        queryHeaders.unshift(`POST /${this.options.interfaceName} HTTP/1.1`, `HOST: ${hostname}:${port}`);
         encodeArgs = {
           jsonrpc: this.jsonRpcVersion || '2.0',
           method,
@@ -183,7 +187,7 @@ export class Consumer extends SDKBase {
         };
       }
 
-      const buffer = this._encoder.encode(method, encodeArgs, headers);
+      const buffer = this._encoder.encode(method, encodeArgs, queryHeaders);
 
       return this._client.request(hostname, port, buffer, this.options.protocol, options.timeout)
         .then((res) => {

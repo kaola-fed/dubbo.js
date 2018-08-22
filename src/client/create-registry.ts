@@ -1,3 +1,4 @@
+import { Logger } from './../interface/logger';
 import { logger } from './../tools/logger';
 import { ZKClientOptions } from './interface/zk-client-options';
 import { ZKClient } from './../core/registry/index';
