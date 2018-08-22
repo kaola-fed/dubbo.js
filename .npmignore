@@ -2,7 +2,6 @@
 !*.d.ts
 src/
 test/
-types/
 coverage/
 .github/
 .DS_Store
