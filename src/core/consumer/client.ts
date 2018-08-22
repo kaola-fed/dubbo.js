@@ -143,7 +143,7 @@ class RequestBase {
           if (this._protocol.toLowerCase() === 'jsonrpc') {
             // console.log('jsonRpc request done');
             if (!this._heap) {
-              this._heap = new Buffer('');
+              this._heap = Buffer.from('');
             }
 
             this._heap += chunk;

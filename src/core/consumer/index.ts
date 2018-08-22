@@ -1,6 +1,7 @@
+// eslint-disable-next-line
+import { RegistryAPIClient } from './../../client/create-registry';
 import { InvokeOptions } from './../../interface/invoke-options';
 import { Discoverer } from './discoverer';
-import { RegistryAPIClient } from './../../client/create-registry';
 import { ConsumerOptions } from './../../interface/consumer-options';
 import { CircuitBreaker } from './circuit-breaker';
 import { Client, ClientWithPool } from './client';

@@ -1,5 +1,6 @@
-import { ZKClientOptions } from '../../interface/zk-client-options';
+// eslint-disable-next-line
 import { Logger } from './../../interface/logger';
+import { ZKClientOptions } from '../../interface/zk-client-options';
 import SDKBase from 'sdk-base';
 import zookeeper from 'zookeeper-cluster-client';
 import assert from 'assert';

@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import { Logger } from './../interface/logger';
 import { logger } from './../tools/logger';
 import { ZKClientOptions } from './interface/zk-client-options';
