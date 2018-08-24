@@ -30,50 +30,11 @@ const throws = name => {
   throw new Error(`${name} must be implemented`);
 };
 
-/**
- * 计算字符串所占的内存字节数，默认使用UTF-8的编码方式计算
- * UTF-8 是一种可变长度的 Unicode 编码格式，使用一至四个字节为每个字符编码
- *
- * 000000 - 00007F(128个代码)      0zzzzzzz(00-7F)                             一个字节
- * 000080 - 0007FF(1920个代码)     110yyyyy(C0-DF) 10zzzzzz(80-BF)             两个字节
- * 000800 - 00D7FF
-   00E000 - 00FFFF(61440个代码)    1110xxxx(E0-EF) 10yyyyyy 10zzzzzz           三个字节
- * 010000 - 10FFFF(1048576个代码)  11110www(F0-F7) 10xxxxxx 10yyyyyy 10zzzzzz  四个字节
- *
- * 注: Unicode在范围 D800-DFFF 中不存在任何字符
- *
- * @param  {String} str
- * @return {Number}
- */
-const sizeof = (str) => {
-  let total = 0;
-  let charCode;
-  let i;
-  let len;
-
-  for (i = 0, len = str.length; i < len; i++) {
-    charCode = str.charCodeAt(i);
-    if (charCode <= 0x007f) {
-      total += 1;
-    } else if (charCode <= 0x07ff) {
-      total += 2;
-    } else if (charCode <= 0xffff) {
-      total += 3;
-    } else {
-      total += 4;
-    }
-  }
-
-  return total;
-};
-
 const lenReg = /Content-Length: (\d+)\r\n/;
 const isover = (response) => {
-  const tmpResponse = response.toString();
-
   try {
-    let bodyLength = tmpResponse.match(lenReg)[1];
-    return sizeof(tmpResponse.split('\r\n\r\n')[1]) >= bodyLength;
+    let bodyLength = response.match(lenReg)[1];
+    return Buffer.from(response.split('\r\n\r\n')[1]).length >= bodyLength;
   } catch (e) {
     return true;
   }
