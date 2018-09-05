@@ -1,3 +1,23 @@
+<a name="0.2.13"></a>
+## [0.2.13](https://github.com/kaola-fed/dubbo.js/compare/v0.2.12...v0.2.13) (2018-09-05)
+
+
+### Bug Fixes
+
+* resolve socket reconnect error ([2316be8](https://github.com/kaola-fed/dubbo.js/commit/2316be8))
+
+
+
+<a name="0.2.12"></a>
+## [0.2.12](https://github.com/kaola-fed/dubbo.js/compare/v0.2.11...v0.2.12) (2018-08-30)
+
+
+### Bug Fixes
+
+* 修复jsonRpc传参数带中文的问题，主要是请求体长度判断修正 ([f887d77](https://github.com/kaola-fed/dubbo.js/commit/f887d77))
+
+
+
 <a name="0.2.11"></a>
 ## [0.2.11](https://github.com/kaola-fed/dubbo.js/compare/v0.2.10...v0.2.11) (2018-08-22)
 
