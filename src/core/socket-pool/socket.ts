@@ -14,6 +14,7 @@ const isValidTimeout = timeout => typeof timeout === 'number' && timeout > 0;
 export default class Socket {
     _socket;
     _pool = null;
+    _options = null;
     _destroyed = false;
     _connected = false;
 
@@ -23,7 +24,7 @@ export default class Socket {
 
     constructor(options) {
       this._socket = new _Socket(options);
-
+      this._options = options;
       this._socket.once('end', () => this.destroy());
     }
     /**
@@ -34,6 +35,11 @@ export default class Socket {
     connect(config, timeout) {
       if (this._connected && this._socket.readable) {
         return Promise.resolve(this);
+      }
+
+      if (this._connected) {
+        this._socket.destroy();
+        this._socket = new _Socket(this._options);
       }
 
       this._connected = true;
