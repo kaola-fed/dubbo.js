@@ -96,7 +96,15 @@ launch()
 ### createRpcClient
 interfaceName的服务对应产生的rpc客户端实例，可直接产生其消费者实例
 
-        interfaceName 对应服务端提供的服务
+        createRpcClient({
+            registry,
+            interfaceName
+        })
+        参数说明：
+        interfaceName：
+        代表 dubbo 暴露的接口服务，根据 interface 字段会找到对应接口的 provider，与 Java 开发约定即可。
+        registry：
+        使用createRegistry创建的实例
         
 # 使用示例
 以下是一次使用jsonrpc协议调用dubbo服务的操作
@@ -158,9 +166,7 @@ launch()
     .catch(console.error);
 ```
 
-createConsumer配置解释（标*为必填字段）：
-#### interfaceName
-代表 dubbo 暴露的接口服务，根据 interface 字段会找到对应接口的 provider，与 Java 开发约定即可。
+### createConsumer配置解释（标*为必填字段）：
 
 #### * config.protocol
 目前支持的 rpc 调用方式有：

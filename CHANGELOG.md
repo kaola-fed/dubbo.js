@@ -1,3 +1,13 @@
+<a name="0.2.14"></a>
+## [0.2.14](https://github.com/kaola-fed/dubbo.js/compare/v0.2.13...v0.2.14) (2018-09-07)
+
+
+### Features
+
+* 增加可选loadBalancer方法 & 熔断器可配 ([210e3ee](https://github.com/kaola-fed/dubbo.js/commit/210e3ee))
+
+
+
 <a name="0.2.13"></a>
 ## [0.2.13](https://github.com/kaola-fed/dubbo.js/compare/v0.2.12...v0.2.13) (2018-09-05)
 
