@@ -1,14 +1,13 @@
-export function randomLoadBalance() {
+function randomLoadBalance() {
   return function(list) {
     return list[Math.floor(Math.random() * list.length)];
   };
 }
 
-export function roundRoubinLoadBalance(l) {
+function roundRobinLoadBalance() {
   const lastItemMap = new Map();
-  const list = l;
 
-  return function(mode = 'defualt') {
+  return function(list, mode = 'defualt') {
     if (!list) return '';
 
     let last = lastItemMap.get(mode);
@@ -28,3 +27,8 @@ export function roundRoubinLoadBalance(l) {
     return list[last];
   };
 }
+
+export default {
+  randomLoadBalance,
+  roundRobinLoadBalance
+};

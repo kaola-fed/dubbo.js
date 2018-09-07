@@ -13,4 +13,5 @@ export interface ConsumerOptions {
     timeout: number;
     check: boolean;
     pool: any;
+    circuitBreaker: any;
 }

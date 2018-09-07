@@ -4,11 +4,12 @@ enum states {
     HalfOpened,
 }
 const TIMEOUT = 10 * 1000;
-const LIMIT = 10;
+const FAIL_LIMIT = 10;
+
+
+const SUCC_LIMIT = 3;
 
 export class CircuitBreaker {
-    timeout = TIMEOUT;
-    limit = LIMIT;
     succCount = 0;
     failedCount = 0;
     state = states.Closed;
@@ -20,6 +21,18 @@ export class CircuitBreaker {
 
     get meta() {
       return this.options.meta || {};
+    }
+
+    get timeout() {
+      return this.options.openTimeout || TIMEOUT;
+    }
+
+    get failLimit() {
+      return this.options.failLimit || FAIL_LIMIT;
+    }
+
+    get succLimit() {
+      return this.options.succLimit || SUCC_LIMIT;
     }
 
     static group(list: Array<CircuitBreaker>) {
@@ -56,7 +69,7 @@ export class CircuitBreaker {
       this.failedCount = 0;
 
       if (this.isHalfOpened()) {
-        if (this.succCount >= this.limit) {
+        if (this.succCount >= this.succLimit) {
           this.state = states.Closed;
         }
       }
@@ -67,7 +80,7 @@ export class CircuitBreaker {
       this.failedCount++;
       this.succCount = 0;
 
-      if (this.failedCount >= this.limit) {
+      if (this.failedCount >= this.failLimit) {
         this.state = states.Opend;
 
         setTimeout(function() {

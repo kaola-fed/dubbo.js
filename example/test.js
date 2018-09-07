@@ -1,11 +1,11 @@
 const conf = require('./config');
 const { createRegistry, createRpcClient } = require('../dist');
 
-// const sleep = async (time) => {
-//   return new Promise((resolve) => {
-//     setTimeout(() => resolve(), time);
-//   });
-// };
+const sleep = async (time) => {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(), time);
+  });
+};
 
 async function launch() {
   const registry = createRegistry({
@@ -26,11 +26,19 @@ async function launch() {
     group: 'performance',
     protocol: 'jsonrpc',
     timeout: 3000,
+    loadBalance: 'roundRobin',                //连接池中负载均衡方式，默认 ‘random’，可选 ‘random’，‘roundRobin’
     pool: {
-      min: 2,
-      max: 4,
-      maxWaitingClients: 10,
+      min: 2,                             //连接池最小连接数， 默认 2
+      max: 4,                             //连接池最大连接数， 默认 4
+      maxWaitingClients: 10,           
+      evictionRunIntervalMillis: 10000,   //轮询清理空闲太久未使用的连接的时间间隔，默认 10000ms
+      idleTimeoutMillis: 180000,          //这段时间内连接未被使用会被当作空闲连接，然后被上述evict流程清理，默认 180000ms
       keepAlive: true
+    },
+    circuitBreaker: {
+      openTimeout: 10000,               // 默认 10s，熔断时间窗口，熔断的连接等待10s后会尝试半开等待探活
+      failLimit: 10,                    // 默认 10次，连接连续异常处理请求10次后被熔断
+      succLimit: 5                      // 默认 3次， 连续成功处理请求3次后连接被打开
     }
   });
 
@@ -81,17 +89,17 @@ async function launch() {
 
     await consumer.ready();
     const res = await consumer.invoke('findAttachments', ['k1'], ['Dubbo-Attachments: k1=aa,k2=bb,k3=123'], {
-      retry: 1,
+      retry: 3,
       rpcMsgId: 2
     });
-    console.log(res);
-    // await sleep(500);
-    // let res1 = await consumer.invoke('findAttachments', ['k2'], ['Dubbo-Attachments: k1=aa,k2=bb,k3=123'], {
-    //   retry: 1
-    // });
-    // await sleep(500);
+    await sleep(500);
+    
+    let res1 = await consumer.invoke('findAttachments', ['k2'], ['Dubbo-Attachments: k1=aa,k2=bb,k3=123'], {
+      retry: 1
+    });
+    await sleep(500);
   
-    // console.log('findAttachments', res, res1);
+    console.log('findAttachments', res, res1);
   } catch (e) {
     await registry.close();
     //await consumer.close();

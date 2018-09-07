@@ -9,7 +9,7 @@ import Encoder from '../../tools/encoder';
 import SDKBase from 'sdk-base';
 import assert from 'assert';
 import URL from 'url';
-import { randomLoadBalance /*roundRoubinLoadBalance*/ } from './load-balancer';
+import LB from './load-balancer';
 
 const SERVER_ADDRESS = Symbol('serverAddress');
 // enum states {
@@ -71,13 +71,13 @@ export class Consumer extends SDKBase {
     set serverAddress(serverAddress) {
       this[SERVER_ADDRESS] = serverAddress
         .map(
-          ({ protocol, hostname, port }) => new CircuitBreaker({
+          ({ protocol, hostname, port }) => new CircuitBreaker(Object.assign({}, {
             meta: {
               protocol,
               hostname,
               port
             }
-          })
+          }, this.options.circuitBreaker || {}))
         );
     }
 
@@ -93,11 +93,19 @@ export class Consumer extends SDKBase {
         protocol: 'jsonrpc',
         methods: ['test']
         timeout: 3000,
+        loadBalance: 'random',            //连接池中负载均衡方式，默认 ‘random’，可选 ‘random’，‘roundRobin’
         pool: {
-          min: 2,
-          max: 4,
+          min: 2,                         //连接池最小连接数， 默认 2
+          max: 4,                         //连接池最大连接数， 默认 4
           maxWaitingClients: 10,
+          evictionRunIntervalMillis: 10000,   //轮询清理空闲太久未使用的连接的时间间隔，默认 10000ms
+          idleTimeoutMillis: 180000,          //这段时间内连接未被使用会被当作空闲连接，然后被上述evict流程清理，默认 180000ms
           keepAlive: true
+        },
+        circuitBreaker: {
+          openTimeout: 10000,               // 默认 10s，熔断时间窗口，熔断的连接等待10s后会尝试半开等待探活
+          failLimit: 10,                    // 默认 10次，连接连续异常处理请求10次后被熔断
+          succLimit: 3                      // 默认 3次， 连续成功处理请求3次后连接被打开
         }
       });
     */
@@ -110,7 +118,8 @@ export class Consumer extends SDKBase {
         dubboVersion: '2.8.0',
         jsonRpcVersion: '2.0',
         version: '1.0',
-        protocol: 'dubbo'
+        protocol: 'dubbo',
+        loadBalance: 'random',
       }, opts);
 
       this._encoder = new Encoder(options);
@@ -120,7 +129,7 @@ export class Consumer extends SDKBase {
         : new Client();
 
       this.options = options;
-      this.balancerLoad = randomLoadBalance();
+      this.balancerLoad = LB[`${options.loadBalance}LoadBalance`]();
       assert(options.registry || options.serverHosts, 'rpcClient.createConsumer(options) 需要指定 options.serverHosts');
     }
 
@@ -156,7 +165,7 @@ export class Consumer extends SDKBase {
 
       //let state;
 
-      if (halfOpened.length > 0 && this.isExploreTraffic() && options.retry === 1) {
+      if (halfOpened.length > 0 && this.isExploreTraffic()) {
         // 探活流量
         item = this.balancerLoad(halfOpened, 'halfOpened');
         //state = states.discovery;
@@ -167,7 +176,7 @@ export class Consumer extends SDKBase {
       }
 
       if (!item) {
-        return options.mock || 'remote service is unreachable';
+        return options.mock || 'remote service is unreachable & lack arguments \'options.mock\'. now you should wait it auto try request halfOpened service for a while.';
       }
 
       // 3. Socket Pool 代理 socket 复用
