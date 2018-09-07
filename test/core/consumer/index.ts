@@ -87,20 +87,20 @@ describe('test/core/consumer/index.ts', () => {
         await consumer.ready();
     });
 
-    it('invoke when all service break opened', async () => {
-        consumer.serverAddress[0].limit = 1;
-        consumer.serverAddress[0].failed();
+    // it('invoke when all service break opened', async () => {
+    //     consumer.serverAddress[0].limit = 1;
+    //     consumer.serverAddress[0].failed();
 
-        await consumer.invoke('m1', [], []).catch(e => {
-            assert.throws(function() { throw e; }, /所有的服务提供方都被熔断了/);
-        });        
-    });
+    //     await consumer.invoke('m1', [], []).catch(e => {
+    //         assert.throws(function() { throw e; }, /所有的服务提供方都被熔断了/);
+    //     });        
+    // });
 
     it('invoke when there is no available item', async () => {
         consumer.serverAddress[0].state = states.HalfOpened;
         let res = await consumer.invoke('m1', [], []);
 
-        assert.equal(res, 'remote service is unreachable');
+        assert.equal(res, 'remote service is unreachable & lack arguments \'options.mock\'. now you should wait it auto try request halfOpened service for a while.');
     });
 
     it('invoke a jsonrpc method okay', async () => {
