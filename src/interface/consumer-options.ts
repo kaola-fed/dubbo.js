@@ -1,4 +1,4 @@
-import { RegistryAPIClient } from './../client/create-registry';
+import { RegistryAPIClient } from './../cluster-client/create-registry';
 export interface ConsumerOptions {
     registry: RegistryAPIClient;
     interfaceName: string;
