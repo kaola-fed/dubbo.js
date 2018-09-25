@@ -12,25 +12,7 @@ const RESPONSE_NULL_VALUE     = 2;
 export default function decode(income, protocol) {
   let heap = income;
   if (protocol.toLowerCase() === 'jsonrpc') {
-    try {
-      const resp = heap.split('\r\n\r\n');
-      const headers = resp[0].split('\r\n');
-      const stateCode = headers[0].split(' ')[1];
-      // console.log(resp, headers, stateCode);
-      // if (Number(stateCode) === 200) {
-      heap = JSON.parse(resp[1]);
-      // }
-
-      return Promise.resolve({
-        code: stateCode,
-        body: heap
-      });
-    } catch {
-      return Promise.resolve({
-        code: -1,
-        msg: heap
-      });
-    }
+    return Promise.resolve(heap);
   }
 
   let flag; let
