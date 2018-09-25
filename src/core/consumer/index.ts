@@ -64,6 +64,10 @@ export class Consumer extends SDKBase {
       return this.options.interfaceName;
     }
 
+    get protocol() {
+      return this.options.protocol;
+    }
+
     get jsonRpcVersion() {
       return this.options.jsonRpcVersion;
     }
@@ -134,9 +138,12 @@ export class Consumer extends SDKBase {
     }
 
     async invoke(method, args, headers = [], options: InvokeOptions = { rpcMsgId: 1 }) {
+      options.__trace && options.__trace.start();
+
       if (this.serverAddress.length === 0) {
         let noneError = new NoneProviderError(this);
 
+        options.__trace && options.__trace.end(noneError);
         if (options.mock) {
           console.error(noneError);
           return options.mock;
@@ -149,6 +156,7 @@ export class Consumer extends SDKBase {
       if (opened.length === this.serverAddress.length) {
         let allBreakError = new AllCircuitBreakersOpenedError(this);
 
+        options.__trace && options.__trace.end(allBreakError);
         if (options.mock) {
           console.error(allBreakError);
           return options.mock;
@@ -176,6 +184,7 @@ export class Consumer extends SDKBase {
       }
 
       if (!item) {
+        options.__trace && options.__trace.end('remote service is unreachable');
         return options.mock || 'remote service is unreachable & lack arguments \'options.mock\'. now you should wait it auto try request halfOpened service for a while.';
       }
 
@@ -195,6 +204,7 @@ export class Consumer extends SDKBase {
           params: args,
           id: options.rpcMsgId || 1
         };
+        options.__trace && queryHeaders.push(options.__trace.header());
       }
 
       const buffer = this._encoder.encode(method, encodeArgs, queryHeaders);
@@ -206,6 +216,7 @@ export class Consumer extends SDKBase {
         // 4.1.2 解析上下文信息
         // 4.1.3 CircuitBreaker.succ
           item.succ();
+          options.__trace && options.__trace.end();
           return res;
         })
         .catch(err => {
@@ -215,6 +226,8 @@ export class Consumer extends SDKBase {
         // 4.2.3 CircuitBreaker.failed
           console.error(err);
           item.failed();
+
+          options.__trace && options.__trace.end(err);
           if (options.retry > 0) {
             options.retry = options.retry - 1;
             return this.invoke(method, args, headers, options);

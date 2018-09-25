@@ -18,7 +18,7 @@ describe('test/core/consumer/index.ts', () => {
     before(() => {
         registry = createRegistry({
             logger: console,
-            zkHosts: '10.170.164.121:2181'
+            zkHosts: 'kaola-test-dubbozk01.v1.kaola.jdb.vpc:2181,kaola-test-dubbozk02.v1.kaola.jdb.vpc:2181,kaola-test-dubbozk03.v1.kaola.jdb.vpc:2181'
         });
 
     });
@@ -57,7 +57,7 @@ describe('test/core/consumer/index.ts', () => {
     it ('new ConsumerDataClient({registry}) with socket pool', async () => {
         consumer = new Consumer({
             registry: registry,
-            interfaceName: 'com.netease.haitao.message.service.MessageFatigueServiceFacade',
+            interfaceName: 'com.netease.kaola.compose.ic.service.goods.PublishGoodsCompose',
             pool: {
                 min: 2,
                 max: 4,
@@ -75,7 +75,7 @@ describe('test/core/consumer/index.ts', () => {
 
     it ('new Consumer({serverHosts})', async () => {
         consumer = new Consumer({
-            interfaceName: 'com.netease.haitao.message.service.MessageFatigueServiceFacade',
+            interfaceName: 'com.netease.kaola.compose.ic.service.goods.PublishGoodsCompose',
             dubboVersion: '3.0.1',
             version: '1.0',
             group: 'perfor',

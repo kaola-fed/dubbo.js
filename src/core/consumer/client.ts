@@ -31,15 +31,45 @@ const throws = name => {
 };
 
 const lenReg = /Content-Length: (\d+)\r\n/;
+const isChunked = /\r\nTransfer-Encoding: chunked\r\n/;
+
 const isover = (response) => {
   try {
-    let bodyLength = response.match(lenReg)[1];
-    return Buffer.from(response.split('\r\n\r\n')[1]).length >= bodyLength;
+    let chunked = response.match(isChunked);
+    if (chunked) {
+      let resp = response.split('\r\n\r\n');
+      let body = resp[1].split('\r\n');
+
+      if (Buffer.from(body[1]).length >= parseInt(body[0], 16)) {
+        const headers = resp[0].split('\r\n');
+        const code = headers[0].split(' ')[1];
+        return {
+          code,
+          body: JSON.parse(body[1])
+        };
+      }
+    } else {
+      let bodyLength = response.match(lenReg)[1];
+      let body = response.split('\r\n\r\n');
+      if (Buffer.from(body[1]).length >= bodyLength) {
+        const headers = body[0].split('\r\n');
+        const code = headers[0].split(' ')[1];
+        return {
+          code,
+          body: JSON.parse(body[1])
+        };
+      }
+    }
+
+    return null;
   } catch (e) {
-    return true;
+    console.log(e);
+    return {
+      code: -1,
+      body: response
+    };
   }
 };
-
 class RequestBase {
     _socket;
     _host;
@@ -87,6 +117,7 @@ class RequestBase {
         this._reject = once(reject);
         let bufferHelper = new BufferHelper();
         let bufferLength = DEFAULT_BUFFER_LENGTH;
+        let overResult = null;
         const socket = this._socket;
 
         socket.on('error', err => {
@@ -101,8 +132,10 @@ class RequestBase {
             bufferHelper.concat(chunk);
 
             this._heap = bufferHelper.toBuffer().toString();
-            // TODO: 现在只处理了jsonrpc有content-length的返回，对trunk的返回结果未解析
-            if (isover(this._heap)) {
+            // NEW: 现在加上无content-length的返回，对trunk的返回结果进行解析
+            overResult = isover(this._heap);
+            if (overResult) {
+              this._heap = overResult;
               this._done();
             }
           } else if (this._protocol.toLowerCase() === 'dubbo') {
