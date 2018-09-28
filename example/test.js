@@ -10,21 +10,21 @@ const sleep = async (time) => {
 async function launch() {
   const registry = createRegistry({
     logger: console,
-    zkHosts: 'kaola-test-dubbozk01.v1.kaola.jdb.vpc:2181,kaola-test-dubbozk02.v1.kaola.jdb.vpc:2181,kaola-test-dubbozk03.v1.kaola.jdb.vpc:2181'
+    zkHosts: conf.zkHost
   });
 
   await registry.ready();
 
   const rpcClient = createRpcClient({
     registry,
-    interfaceName: 'com.netease.kaola.pop.crm.web.service.GoodsService'
+    interfaceName: conf.jsonPath
   });
 
   const consumer = rpcClient.createConsumer({
     dubboVersion: '3.0.6-SNAPSHOT',
     version: '',
-    group: "pop_test1jd",
-    protocol: "jsonrpc",
+    group: 'performance',
+    protocol: 'jsonrpc',
     timeout: 3000,
     loadBalance: 'roundRobin',                //连接池中负载均衡方式，默认 ‘random’，可选 ‘random’，‘roundRobin’
     pool: {
@@ -88,19 +88,14 @@ async function launch() {
     // console.log('register', res);
 
     await consumer.ready();
-    const res = await consumer.invoke('queryCategoryTreeVOs', [{
-
-    }], [''], {
+    const res = await consumer.invoke('findAttachments', ['k1'], ['Dubbo-Attachments: k1=aa,k2=bb,k3=123'], {
       retry: 3,
       rpcMsgId: 2
     });
     await sleep(500);
     
-    let res1 = await consumer.invoke('queryGoodsList', [{
-
-    }], [''], {
-      retry: 3,
-      rpcMsgId: 2
+    let res1 = await consumer.invoke('findAttachments', ['k2'], ['Dubbo-Attachments: k1=aa,k2=bb,k3=123'], {
+      retry: 1
     });
     await sleep(500);
   

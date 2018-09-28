@@ -117,9 +117,9 @@ class RequestBase {
       return new Promise((resolve, reject) => {
         this._resolve = once(resolve);
         this._reject = once(reject);
-        let bufferHelper = new BufferHelper();
+        // let bufferHelper = new BufferHelper();
         let bufferLength = DEFAULT_BUFFER_LENGTH;
-        let overResult = null;
+        // let overResult = null;
         const socket = this._socket;
 
         socket.on('error', err => {
@@ -318,10 +318,7 @@ export class JsonRpcClient {
         }
       }, function (err, body) {
         if (err) {
-          reject({
-            code: -1,
-            body: err
-          });
+          reject(err);
         } else {
           resolve({
             code: body.result.code,
