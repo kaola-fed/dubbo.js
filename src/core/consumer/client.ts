@@ -1,5 +1,7 @@
 // Socket client with connection pool
 import net from 'net';
+import http from 'http';
+import urllib from 'urllib';
 import pTimeout from 'p-timeout';
 import Pool from '../socket-pool';
 import once from 'once';
@@ -30,46 +32,46 @@ const throws = name => {
   throw new Error(`${name} must be implemented`);
 };
 
-const lenReg = /Content-Length: (\d+)\r\n/;
-const isChunked = /\r\nTransfer-Encoding: chunked\r\n/;
+// const lenReg = /Content-Length: (\d+)\r\n/;
+// const isChunked = /\r\nTransfer-Encoding: chunked\r\n/;
 
-const isover = (response) => {
-  try {
-    let chunked = response.match(isChunked);
-    if (chunked) {
-      let resp = response.split('\r\n\r\n');
-      let body = resp[1].split('\r\n');
+// const isover = (response) => {
+//   try {
+//     let chunked = response.match(isChunked);
+//     if (chunked) {
+//       let resp = response.split('\r\n\r\n');
+//       let body = resp[1].split('\r\n');
 
-      if (Buffer.from(body[1]).length >= parseInt(body[0], 16)) {
-        const headers = resp[0].split('\r\n');
-        const code = headers[0].split(' ')[1];
-        return {
-          code,
-          body: JSON.parse(body[1])
-        };
-      }
-    } else {
-      let bodyLength = response.match(lenReg)[1];
-      let body = response.split('\r\n\r\n');
-      if (Buffer.from(body[1]).length >= bodyLength) {
-        const headers = body[0].split('\r\n');
-        const code = headers[0].split(' ')[1];
-        return {
-          code,
-          body: JSON.parse(body[1])
-        };
-      }
-    }
+//       if (Buffer.from(body[1]).length >= parseInt(body[0], 16)) {
+//         const headers = resp[0].split('\r\n');
+//         const code = headers[0].split(' ')[1];
+//         return {
+//           code,
+//           body: JSON.parse(body[1])
+//         };
+//       }
+//     } else {
+//       let bodyLength = response.match(lenReg)[1];
+//       let body = response.split('\r\n\r\n');
+//       if (Buffer.from(body[1]).length >= bodyLength) {
+//         const headers = body[0].split('\r\n');
+//         const code = headers[0].split(' ')[1];
+//         return {
+//           code,
+//           body: JSON.parse(body[1])
+//         };
+//       }
+//     }
 
-    return null;
-  } catch (e) {
-    console.log(e);
-    return {
-      code: -1,
-      body: response
-    };
-  }
-};
+//     return null;
+//   } catch (e) {
+//     console.log(e);
+//     return {
+//       code: -1,
+//       body: response
+//     };
+//   }
+// };
 class RequestBase {
     _socket;
     _host;
@@ -127,18 +129,7 @@ class RequestBase {
         });
 
         socket.on('data', chunk => {
-          if (this._protocol.toLowerCase() === 'jsonrpc') {
-            // console.log('jsonRpc request done');
-            bufferHelper.concat(chunk);
-
-            this._heap = bufferHelper.toBuffer().toString();
-            // NEW: 现在加上无content-length的返回，对trunk的返回结果进行解析
-            overResult = isover(this._heap);
-            if (overResult) {
-              this._heap = overResult;
-              this._done();
-            }
-          } else if (this._protocol.toLowerCase() === 'dubbo') {
+          if (this._protocol.toLowerCase() === 'dubbo') {
             const chunks = this._chunks;
             if (!chunks.length) {
               bufferLength += extraLength(chunk);
@@ -299,4 +290,45 @@ export class ClientWithPool extends ClientBase {
       const pool = this._getPool(host, Number(port));
       return pool.acquire();
     }
+}
+
+export class JsonRpcClient {
+  agent = null;
+  httpclient = null;
+
+  constructor(option) {
+    this.httpclient = option.httpclient || urllib.create();
+    this.agent = option.agent || new http.Agent({
+      keepAlive: true,
+      maxSockets: 8
+    });
+  }
+
+  async request(hostname, port, param, protocol, timeout) {
+    return new Promise((resolve, reject) => {
+      this.httpclient.request(`${hostname}${port ? `:${port}` : ''}/${param.path}`, {
+        method: 'POST',
+        data: param.data,
+        timeout,
+        agent: this.agent,
+        dataType: 'json',
+        contentType: 'json',
+        headers: {
+          Connection: 'keep-alive'
+        }
+      }, function (err, body) {
+        if (err) {
+          reject({
+            code: -1,
+            body: err
+          });
+        } else {
+          resolve({
+            code: body.result.code,
+            body
+          });
+        }
+      });
+    });
+  }
 }

@@ -1,6 +1,6 @@
 {
   "name": "dubbo.js",
-  "version": "0.2.15",
+  "version": "0.2.16-pre1",
   "devDependencies": {
     "@types/assert": "^0.0.31",
     "@types/mocha": "^5.2.3",
@@ -63,6 +63,7 @@
     "p-timeout": "^2.0.1",
     "sdk-base": "^3.4.0",
     "semver": "^5.5.1",
+    "urllib": "^2.30.0",
     "zookeeper-cluster-client": "^2.0.1"
   },
   "husky": {

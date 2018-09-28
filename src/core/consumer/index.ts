@@ -4,7 +4,7 @@ import { InvokeOptions } from './../../interface/invoke-options';
 import { Discoverer } from './discoverer';
 import { ConsumerOptions } from './../../interface/consumer-options';
 import { CircuitBreaker } from './circuit-breaker';
-import { Client, ClientWithPool } from './client';
+import { Client, ClientWithPool, JsonRpcClient } from './client';
 import Encoder from '../../tools/encoder';
 import SDKBase from 'sdk-base';
 import assert from 'assert';
@@ -128,9 +128,9 @@ export class Consumer extends SDKBase {
 
       this._encoder = new Encoder(options);
 
-      this._client = options.pool
+      this._client = options.protocol === 'jsonrpc' ? new JsonRpcClient(options) : (options.pool
         ? new ClientWithPool(options.pool)
-        : new Client();
+        : new Client());
 
       this.options = options;
       this.balancerLoad = LB[`${options.loadBalance}LoadBalance`]();
@@ -194,20 +194,22 @@ export class Consumer extends SDKBase {
 
 
       let queryHeaders = [].concat(headers);
-
+      let buffer = null;
       // 构造jsonRpc POST请求头
       if (this.options.protocol.toLowerCase() === 'jsonrpc') {
-        queryHeaders.unshift(`POST /${this.options.interfaceName} HTTP/1.1`, `HOST: ${hostname}:${port}`);
-        encodeArgs = {
-          jsonrpc: this.jsonRpcVersion || '2.0',
-          method,
-          params: args,
-          id: options.rpcMsgId || 1
-        };
         options.__trace && queryHeaders.push(options.__trace.header());
+        buffer = {
+          path: this.options.interfaceName,
+          data: {
+            jsonrpc: this.jsonRpcVersion || '2.0',
+            method,
+            params: args,
+            id: options.rpcMsgId || 1
+          }
+        };
+      } else {
+        buffer = this._encoder.encode(method, encodeArgs, queryHeaders);
       }
-
-      const buffer = this._encoder.encode(method, encodeArgs, queryHeaders);
 
       return this._client.request(hostname, port, buffer, this.options.protocol, options.timeout)
         .then((res) => {

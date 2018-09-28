@@ -183,6 +183,12 @@ dubbo暴露的接口对呀的dubbo版本，用来筛选接口，默认为 '2.8.0
 #### config.jsonRpcVersion
 jsonrpc协议暴露的接口对呀的版本，用来调用接口， 默认为 '2.0'版本
 
+#### config.httpclient
+jsonrpc支持用户传入自己的httpclient，否则采用默认
+
+#### config.agent
+jsonrpc支持用户传入自定义agent，否则采用默认http.Agent
+
 #### config.version
 version 字段用来对找到的 provider 进行删选，不填或填写 '*' 则不做删选。
 

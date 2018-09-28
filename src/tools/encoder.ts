@@ -94,9 +94,9 @@ export default class Encoder {
         return Buffer.concat([head, body]);
       }
 
-      const body = this._jsonRpcBody(args);
-      const head = this._jsonRpcHead(Buffer.from(body).length, headers);
-      return head + body;
+      // const body = this._jsonRpcBody(args);
+      // const head = this._jsonRpcHead(Buffer.from(body).length, headers);
+      // return head + body;
     }
 
     _jsonRpcHead(len, headers) {

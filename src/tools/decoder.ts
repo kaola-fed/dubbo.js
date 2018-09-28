@@ -11,9 +11,9 @@ const RESPONSE_NULL_VALUE     = 2;
  */
 export default function decode(income, protocol) {
   let heap = income;
-  if (protocol.toLowerCase() === 'jsonrpc') {
-    return Promise.resolve(heap);
-  }
+  // if (protocol.toLowerCase() === 'jsonrpc') {
+  //   return Promise.resolve(heap);
+  // }
 
   let flag; let
     result;
