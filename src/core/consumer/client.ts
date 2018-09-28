@@ -321,7 +321,7 @@ export class JsonRpcClient {
           reject(err);
         } else {
           resolve({
-            code: body.result ? (body.result.code || -1) : -1,
+            code: body.result ? (body.result.code || 200) : -1,
             body
           });
         }
