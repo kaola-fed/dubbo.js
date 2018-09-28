@@ -304,7 +304,7 @@ export class JsonRpcClient {
     });
   }
 
-  async request(hostname, port, param, protocol, timeout) {
+  async request(hostname, port, param, protocol, timeout = 5000) {
     return new Promise((resolve, reject) => {
       this.httpclient.request(`${hostname}${port ? `:${port}` : ''}/${param.path}`, {
         method: 'POST',
@@ -321,7 +321,7 @@ export class JsonRpcClient {
           reject(err);
         } else {
           resolve({
-            code: body.result.code,
+            code: body.result ? (body.result.code || -1) : -1,
             body
           });
         }
