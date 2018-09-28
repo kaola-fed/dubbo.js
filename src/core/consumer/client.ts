@@ -5,7 +5,7 @@ import urllib from 'urllib';
 import pTimeout from 'p-timeout';
 import Pool from '../socket-pool';
 import once from 'once';
-import BufferHelper from 'bufferhelper';
+//import BufferHelper from 'bufferhelper';
 import decode from '../../tools/decoder';
 
 const DEFAULT_BUFFER_LENGTH = 16;
