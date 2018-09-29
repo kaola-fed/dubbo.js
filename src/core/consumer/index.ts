@@ -187,7 +187,7 @@ export class Consumer extends SDKBase {
         options.__trace && options.__trace.end('remote service is unreachable');
         return options.mock || {
           code: -1,
-          msg: 'remote service is unreachable & lack arguments \'options.mock\'. now you should wait it auto try request halfOpened service for a while.'
+          body: 'remote service is unreachable & lack arguments \'options.mock\'. now you should wait it auto try request halfOpened service for a while.'
         };
       }
 
@@ -239,7 +239,7 @@ export class Consumer extends SDKBase {
           }
           return options.mock || {
             code: -1,
-            msg: 'remote service is unreachable'
+            body: 'remote service is unreachable'
           };
         });
     }
