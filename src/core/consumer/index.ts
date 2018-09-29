@@ -185,7 +185,10 @@ export class Consumer extends SDKBase {
 
       if (!item) {
         options.__trace && options.__trace.end('remote service is unreachable');
-        return options.mock || 'remote service is unreachable & lack arguments \'options.mock\'. now you should wait it auto try request halfOpened service for a while.';
+        return options.mock || {
+          code: -1,
+          msg: 'remote service is unreachable & lack arguments \'options.mock\'. now you should wait it auto try request halfOpened service for a while.'
+        };
       }
 
       // 3. Socket Pool 代理 socket 复用
@@ -234,7 +237,10 @@ export class Consumer extends SDKBase {
             options.retry = options.retry - 1;
             return this.invoke(method, args, headers, options);
           }
-          return options.mock || 'remote service is unreachable';
+          return options.mock || {
+            code: -1,
+            msg: 'remote service is unreachable'
+          };
         });
     }
 
