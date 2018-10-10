@@ -1,3 +1,32 @@
+<a name="0.2.18"></a>
+## [0.2.18](https://github.com/kaola-fed/dubbo.js/compare/v0.2.16...v0.2.18) (2018-10-10)
+
+
+### Bug Fixes
+
+* modify err back body ([b947ce2](https://github.com/kaola-fed/dubbo.js/commit/b947ce2))
+
+
+<a name="0.2.16"></a>
+## [0.2.16](https://github.com/kaola-fed/dubbo.js/compare/v0.2.15...v0.2.16) (2018-09-28)
+
+
+### Bug Fixes
+
+* fix resp code ([3595dd9](https://github.com/kaola-fed/dubbo.js/commit/3595dd9))
+
+
+### Features
+
+* use httpclient to resolve jsonrpc protocol ([d3ebbe7](https://github.com/kaola-fed/dubbo.js/commit/d3ebbe7))
+
+
+
+<a name="0.2.15"></a>
+## [0.2.15](https://github.com/kaola-fed/dubbo.js/compare/v0.2.14...v0.2.15) (2018-09-25)
+
+
+
 <a name="0.2.14"></a>
 ## [0.2.14](https://github.com/kaola-fed/dubbo.js/compare/v0.2.13...v0.2.14) (2018-09-07)
 
