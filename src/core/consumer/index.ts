@@ -75,10 +75,11 @@ export class Consumer extends SDKBase {
     set serverAddress(serverAddress) {
       this[SERVER_ADDRESS] = serverAddress
         .map(
-          ({ protocol, hostname, port }) => new CircuitBreaker(Object.assign({}, {
+          ({ protocol, hostname, pathname, port }) => new CircuitBreaker(Object.assign({}, {
             meta: {
               protocol,
               hostname,
+              pathname,
               port
             }
           }, this.options.circuitBreaker || {}))
@@ -126,7 +127,7 @@ export class Consumer extends SDKBase {
         loadBalance: 'random',
       }, opts);
 
-      this._encoder = new Encoder(options);
+      // this._encoder = new Encoder(options);
 
       this._client = options.protocol === 'jsonrpc' ? new JsonRpcClient(options) : (options.pool
         ? new ClientWithPool(options.pool)
@@ -192,9 +193,16 @@ export class Consumer extends SDKBase {
       }
 
       // 3. Socket Pool 代理 socket 复用
-      const { hostname, port } = item.meta;
+      let { hostname, pathname, port } = item.meta;
       let encodeArgs = args;
 
+      if (pathname) {
+        if (pathname.indexOf('/') === 0) {
+          pathname = pathname.slice(1);
+        }
+
+        this.options.interfaceName = pathname;
+      }
 
       let queryHeaders = [].concat(headers);
       let buffer = null;
@@ -211,6 +219,9 @@ export class Consumer extends SDKBase {
           }
         };
       } else {
+        if (!this._encoder) {
+          this._encoder = new Encoder(this.options);
+        }
         buffer = this._encoder.encode(method, encodeArgs, queryHeaders);
       }
 
