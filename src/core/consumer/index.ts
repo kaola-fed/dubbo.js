@@ -219,9 +219,7 @@ export class Consumer extends SDKBase {
           }
         };
       } else {
-        if (!this._encoder) {
-          this._encoder = new Encoder(this.options);
-        }
+        this._encoder = new Encoder(this.options);
         buffer = this._encoder.encode(method, encodeArgs, queryHeaders);
       }
 
