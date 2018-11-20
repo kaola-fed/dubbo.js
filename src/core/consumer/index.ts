@@ -214,7 +214,7 @@ export class Consumer extends SDKBase {
         buffer = this._encoder.encode(method, encodeArgs, queryHeaders);
       }
 
-      return this._client.request(hostname, port, buffer, this.options.protocol, options.timeout)
+      return this._client.request(hostname, port, buffer, this.options.protocol, options.timeout, queryHeaders)
         .then((res) => {
         // 4.1 返回成功
         // 4.1.1 protocol.decode
