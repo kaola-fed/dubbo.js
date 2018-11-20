@@ -314,6 +314,7 @@ export class JsonRpcClient {
       headers = Object.assign({}, headers, {
         [head.substring(0, splitIndex) || 'nothing']: head.substring(splitIndex + 2)
       });
+      return head;
     });
 
     return new Promise((resolve, reject) => {
