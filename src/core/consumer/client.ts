@@ -304,7 +304,19 @@ export class JsonRpcClient {
     });
   }
 
-  async request(hostname, port, param, protocol, timeout = 5000) {
+  async request(hostname, port, param, protocol, timeout = 5000, queryHeaders) {
+    let headers = {
+      Connection: 'keep-alive'
+    };
+
+    queryHeaders.map(head => {
+      let splitIndex = head.indexOf(':');
+      headers = Object.assign({}, headers, {
+        [head.substring(0, splitIndex) || 'nothing']: head.substring(splitIndex + 2)
+      });
+      return head;
+    });
+
     return new Promise((resolve, reject) => {
       this.httpclient.request(`${hostname}${port ? `:${port}` : ''}/${param.path}`, {
         method: 'POST',
@@ -313,9 +325,7 @@ export class JsonRpcClient {
         agent: this.agent,
         dataType: 'json',
         contentType: 'json',
-        headers: {
-          Connection: 'keep-alive'
-        }
+        headers
       }, function (err, body) {
         if (err) {
           reject(err);
