@@ -11,6 +11,7 @@ import assert from 'assert';
 import URL from 'url';
 import LB from './load-balancer';
 
+const PROVIDER_LIST = Symbol('providerList');
 const SERVER_ADDRESS = Symbol('serverAddress');
 // enum states {
 //   normal,
@@ -38,6 +39,7 @@ export class Consumer extends SDKBase {
     _encoder: Encoder;
     options: ConsumerOptions;
     discoverer: Discoverer;
+    [PROVIDER_LIST] = [];
     [SERVER_ADDRESS] = [];
 
     get check() {
@@ -46,6 +48,10 @@ export class Consumer extends SDKBase {
 
     get registry() {
       return this.options.registry;
+    }
+
+    get providerList() {
+      return this[PROVIDER_LIST];
     }
 
     get serverAddress() {
@@ -70,6 +76,10 @@ export class Consumer extends SDKBase {
 
     get jsonRpcVersion() {
       return this.options.jsonRpcVersion;
+    }
+
+    set providerList(providerList) {
+      this[PROVIDER_LIST] = providerList;
     }
 
     set serverAddress(serverAddress) {
@@ -137,8 +147,13 @@ export class Consumer extends SDKBase {
       assert(options.registry || options.serverHosts, 'rpcClient.createConsumer(options) 需要指定 options.serverHosts');
     }
 
-    async invoke(method, args, headers = [], options: InvokeOptions = { rpcMsgId: 1 }) {
+    async invoke(method, args, headers = [], options: InvokeOptions = {
+      beforeInvoke: providerList => Discoverer.checkEnvOrGroup(providerList, null, this.options.group, []),
+      rpcMsgId: 1
+    }) {
       options.__trace && options.__trace.start();
+
+      this.serverAddress = options.beforeInvoke(this.providerList, this.options, Discoverer);
 
       if (this.serverAddress.length === 0) {
         let noneError = new NoneProviderError(this);
@@ -265,8 +280,9 @@ export class Consumer extends SDKBase {
 
     async discovery() {
       const discoverer = new Discoverer(this.options);
-      discoverer.on('update:serverAddress', (serverAddress) => {
-        this.serverAddress = serverAddress;
+      discoverer.on('update:providerList', (providerList) => {
+        // this.serverAddress = serverAddress;
+        this.providerList = providerList;
       });
       await discoverer.ready();
     }

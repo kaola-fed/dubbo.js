@@ -26,6 +26,10 @@ export class Discoverer extends SDKBase {
     return this.options.group || '';
   }
 
+  get env() {
+    return this.options.env || '';
+  }
+
   get version() {
     return this.options.version || '';
   }
@@ -69,13 +73,43 @@ export class Discoverer extends SDKBase {
     });
   }
 
+  static checkEnvOrGroup(providerMetaList, env, group, apps) {
+    if (!env || !group) {
+      return null;
+    }
+
+    let app = null;
+
+
+    let penv = null;
+
+
+    let pgroup = null;
+
+
+    let isAppMatched = false;
+
+    return providerMetaList.filter(({ meta }) => {
+      app = meta.application ? meta.application : meta['default.application'];
+      penv = meta.env ? meta.env : meta['default.env'];
+
+      if (!penv) {
+        pgroup = meta.group ? meta.group : meta['default.group'];
+        return pgroup === group;
+      }
+
+      isAppMatched = apps.includes(app);
+      return (penv === env) && isAppMatched;
+    });
+  }
+
   async _init() {
     this.on('update:providers', (addressList) => {
       let providers = Discoverer.getProviderList(addressList);
       providers = this.filterProvider(providers);
       providers = Discoverer.checkMethods(providers, this.methods);
 
-      this.emit('update:serverAddress', providers);
+      this.emit('update:providerList', providers);
     });
 
     if (!this.registry || !this.registry.subscribe) {
@@ -94,18 +128,18 @@ export class Discoverer extends SDKBase {
   filterProvider(providerMetaList) {
     return providerMetaList.filter(({
       meta = {
-        version: '',
-        group: ''
+        version: ''
       }, protocol
     }) => {
       const version = meta.version ? meta.version : meta['default.version'];
-      const group = meta.group ? meta.group : meta['default.group'];
+      // const env = meta.env ? meta.env : meta['default.env'];
+      // const group = meta.group ? meta.group : meta['default.group'];
 
       const isVersionMatched = !this.version || version === this.version;
-      const isGroupMatched = !this.group || group === this.group;
+      // const isGroupMatched = !this.group || group === this.group;
       const isProtocolMatched = !this.protocol || protocol === (this.protocol + ':');
 
-      return isVersionMatched && isGroupMatched && isProtocolMatched;
+      return isVersionMatched && isProtocolMatched;
     });
   }
 }

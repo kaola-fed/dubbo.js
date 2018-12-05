@@ -331,6 +331,7 @@ export class JsonRpcClient {
           reject(err);
         } else {
           resolve({
+            httpStatus,
             code: body.result ? (body.result.code || 200) : -1,
             body
           });
