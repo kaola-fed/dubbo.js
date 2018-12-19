@@ -153,7 +153,7 @@ export class Consumer extends SDKBase {
     }) {
       options.__trace && options.__trace.start();
 
-      this.serverAddress = options.beforeInvoke(this.providerList, this.options, Discoverer);
+      this.serverAddress = options.beforeInvoke(this.providerList, this.options, Discoverer) || [];
 
       if (this.serverAddress.length === 0) {
         let noneError = new NoneProviderError(this);
@@ -288,7 +288,8 @@ export class Consumer extends SDKBase {
     }
 
     direct() {
-      this.serverAddress = this.options.serverHosts.map(item => URL.parse(item));
+      // this.serverAddress = this.options.serverHosts.map(item => URL.parse(item));
+      this.providerList = this.options.serverHosts.map(item => URL.parse(item));
     }
 
     async close() {

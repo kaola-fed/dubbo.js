@@ -74,7 +74,7 @@ export class Discoverer extends SDKBase {
   }
 
   static checkEnvOrGroup(providerMetaList, env, group, apps) {
-    if (!env || !group) {
+    if (!env && !group) {
       return null;
     }
 
