@@ -311,10 +311,12 @@ export class JsonRpcClient {
 
     queryHeaders.map(head => {
       if (head) {
-        let splitIndex = head.indexOf(':');
-        headers = Object.assign({}, headers, {
-          [head.substring(0, splitIndex) || 'nothing']: head.substring(splitIndex + 2)
-        });
+        try {
+          let splitIndex = head.indexOf(':');
+          headers = Object.assign({}, headers, {
+            [head.substring(0, splitIndex) || 'nothing']: head.substring(splitIndex + 2)
+          });
+        } catch (e) {}
       }
       return head;
     });
