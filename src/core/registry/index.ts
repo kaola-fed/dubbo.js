@@ -47,10 +47,14 @@ export class ZKClient extends SDKBase {
       let zkClusterOptions = options.cluster ? { cluster: options.cluster } : {};
       zkClusterOptions = Object.assign({}, {
         retries: 5,
+        spinDelay: 500,
         sessionTimeout: 5000
       }, zkClusterOptions);
 
       this._zkClient = this.options.zookeeper.createClient(this.zkHosts, zkClusterOptions);
+      this._zkClient.on('disconnected', function () {
+        this.logger.error('The connection between zk client and server is dropped.');
+      });
     }
 
     async _init() {

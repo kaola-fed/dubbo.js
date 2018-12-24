@@ -1,6 +1,6 @@
 {
   "name": "dubbo.js",
-  "version": "0.2.19-pre3",
+  "version": "0.2.19",
   "devDependencies": {
     "@types/assert": "^0.0.31",
     "@types/mocha": "^5.2.3",
