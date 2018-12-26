@@ -52,7 +52,7 @@ export class ZKClient extends SDKBase {
       }, zkClusterOptions);
 
       this._zkClient = this.options.zookeeper.createClient(this.zkHosts, zkClusterOptions);
-      this._zkClient.on('disconnected', function () {
+      this._zkClient.on('disconnected', () => {
         this.logger.error('The connection between zk client and server is dropped.');
       });
     }
