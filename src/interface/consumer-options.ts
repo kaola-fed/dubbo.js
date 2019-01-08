@@ -1,6 +1,7 @@
 import { RegistryAPIClient } from './../client/create-registry';
 export interface ConsumerOptions {
     registry: RegistryAPIClient;
+    entranceEnv: string;
     interfaceName: string;
     jsonRpcVersion: string;
     dubboVersion: string;
