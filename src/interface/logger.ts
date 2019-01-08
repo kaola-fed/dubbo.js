@@ -1,6 +1,6 @@
 export interface Logger {
-    info();
+    info(...args);
     warn(...args);
-    error();
-    debug();
+    error(...args);
+    debug(...args);
 }
