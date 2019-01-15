@@ -43,13 +43,15 @@ export class ZKClient extends SDKBase {
       }, options);
 
       assert(options.zkHosts, '请传入 zkHosts');
-
-      let zkClusterOptions = options.cluster ? { cluster: options.cluster } : {};
-      zkClusterOptions = Object.assign({}, {
+      let zkConfig = options.zkConfig || {};
+      zkConfig = Object.assign({}, {
         retries: 5,
         spinDelay: 500,
-        sessionTimeout: 5000
-      }, zkClusterOptions);
+        sessionTimeout: 30000
+      }, zkConfig);
+
+      let zkClusterOptions = options.cluster ? { cluster: options.cluster } : {};
+      zkClusterOptions = Object.assign({}, zkConfig, zkClusterOptions);
 
       this._zkClient = this.options.zookeeper.createClient(this.zkHosts, zkClusterOptions);
       this._zkClient.on('disconnected', () => {
