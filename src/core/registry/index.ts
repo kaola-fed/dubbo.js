@@ -53,7 +53,11 @@ export class ZKClient extends SDKBase {
 
       this._zkClient = this.options.zookeeper.createClient(this.zkHosts, zkClusterOptions);
       this._zkClient.on('disconnected', () => {
-        this.logger.error('The connection between zk client and server is dropped.');
+        if (this.logger && this.logger.error) {
+          this.logger.error('The connection between zk client and server is dropped.');
+        } else {
+          console.error('The connection between zk client and server is dropped.');
+        }
       });
     }
 
@@ -102,7 +106,11 @@ export class ZKClient extends SDKBase {
         await this._zkClient.mkdirp(consumerPath);
         await this._zkClient.create(path, EMPTY, CreateMode.EPHEMERAL);
       } catch (e) {
-        this.logger.warn('[ZookeeperRegistry] create consumerPath: %s failed, caused by %s', path, e.message);
+        if (this.logger && this.logger.warn) {
+          this.logger.warn('[ZookeeperRegistry] create consumerPath: %s failed, caused by %s', path, e.message);
+        } else {
+          console.warn('[ZookeeperRegistry] create consumerPath: %s failed, caused by %s', path, e.message);
+        }
       }
     }
 
