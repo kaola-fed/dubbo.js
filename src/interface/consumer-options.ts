@@ -13,6 +13,7 @@ export interface ConsumerOptions {
     rpcMsgId: number;
     timeout: number;
     check: boolean;
+    contextPath: string;
     pool: any;
     circuitBreaker: any;
 }

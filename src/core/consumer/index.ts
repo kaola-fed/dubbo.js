@@ -128,12 +128,22 @@ export class Consumer extends SDKBase {
         initMethod: '_init',
       }));
 
+      if (opts.contextPath) {
+        let reg = /^\//gi;
+        opts.contextPath = opts.contextPath.replace(reg, '');
+
+        if (!opts.contextPath.endsWith('/')) {
+          opts.contextPath = `${opts.contextPath}/`;
+        }
+      }
+
       let options = Object.assign({}, {
         dubboVersion: '2.8.0',
         jsonRpcVersion: '2.0',
         version: '1.0',
         protocol: 'dubbo',
         loadBalance: 'random',
+        contextPath: ''
       }, opts);
 
       this._encoder = new Encoder(options);
@@ -217,7 +227,7 @@ export class Consumer extends SDKBase {
       if (this.options.protocol.toLowerCase() === 'jsonrpc') {
         options.__trace && queryHeaders.push(options.__trace.header());
         buffer = {
-          path: this.options.interfaceName,
+          path: `${this.options.contextPath}${this.options.interfaceName}`,
           data: {
             jsonrpc: this.jsonRpcVersion || '2.0',
             method,
