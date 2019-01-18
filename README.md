@@ -126,6 +126,7 @@ async function launch() {
     const config = {
         dubboVersion: '3.0.6-SNAPSHOT',
         version: '1.0',
+        contextPath: 'dubbo',                 // 默认可不填
         group: 'performance',
         protocol: 'jsonrpc',                  //jsonrpc or dubbo，需要看服务端支持情况
         timeout: 3000,
@@ -185,6 +186,9 @@ jsonrpc协议暴露的接口对呀的版本，用来调用接口， 默认为 '2
 
 #### config.httpclient
 jsonrpc支持用户传入自己的httpclient，否则采用默认
+
+#### config.contextPath
+contextPath是java后端定义的区分服务调用路经的，业务上需与后端确认是否有该参数，默认为空
 
 #### config.agent
 jsonrpc支持用户传入自定义agent，否则采用默认http.Agent

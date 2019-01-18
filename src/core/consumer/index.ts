@@ -101,6 +101,7 @@ export class Consumer extends SDKBase {
       new Consumer({
         registry,
         interfaceName: 'com.xxx.yyy',
+        contextPath: 'dubbo', // 默认可不填
         dubboVersion: '2.8.4', // jsonRpcVersion: '2.0',
         version: '1.0.0',
         group: '',
