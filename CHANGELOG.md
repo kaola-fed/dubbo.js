@@ -1,10 +1,36 @@
+<a name="0.3.2"></a>
+## [0.3.2](https://github.com/kaola-fed/dubbo.js/compare/v0.2.18...v0.3.2) (2019-01-23)
+
+
+### Bug Fixes
+
+* add disconnect event listener ([a707669](https://github.com/kaola-fed/dubbo.js/commit/a707669))
+* env logic modify ([ec5fc55](https://github.com/kaola-fed/dubbo.js/commit/ec5fc55))
+* error ([75a54fb](https://github.com/kaola-fed/dubbo.js/commit/75a54fb))
+* fix bugs ([0d2b793](https://github.com/kaola-fed/dubbo.js/commit/0d2b793))
+* fix lose this.logger && update version 0.3.0 ([90ac35d](https://github.com/kaola-fed/dubbo.js/commit/90ac35d))
+* header repeat ([bb5f9e1](https://github.com/kaola-fed/dubbo.js/commit/bb5f9e1))
+* 修复zk默认重试传参问题 ([6cf6914](https://github.com/kaola-fed/dubbo.js/commit/6cf6914))
+
+
+### Features
+
+* add rpc head support ([77fa5b1](https://github.com/kaola-fed/dubbo.js/commit/77fa5b1))
+* support contextPath ([e62115a](https://github.com/kaola-fed/dubbo.js/commit/e62115a))
+* update version 0.3.1 ([49a3574](https://github.com/kaola-fed/dubbo.js/commit/49a3574))
+* 支持entrenceEnv透传 ([fca492b](https://github.com/kaola-fed/dubbo.js/commit/fca492b))
+
+
+
 <a name="0.2.18"></a>
 ## [0.2.18](https://github.com/kaola-fed/dubbo.js/compare/v0.2.16...v0.2.18) (2018-10-10)
 
 
 ### Bug Fixes
 
-* modify err back body ([b947ce2](https://github.com/kaola-fed/dubbo.js/commit/b947ce2))
+* modify err back ([b947ce2](https://github.com/kaola-fed/dubbo.js/commit/b947ce2))
+* modify err back ([0bd4bd9](https://github.com/kaola-fed/dubbo.js/commit/0bd4bd9))
+
 
 
 <a name="0.2.16"></a>
