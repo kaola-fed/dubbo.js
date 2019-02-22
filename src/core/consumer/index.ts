@@ -50,6 +50,10 @@ export class Consumer extends SDKBase {
       return this.options.registry;
     }
 
+    get dnsHandle() {
+      return this.options.dnsHandle || (v => v);
+    }
+
     get providerList() {
       return this[PROVIDER_LIST];
     }
@@ -108,6 +112,7 @@ export class Consumer extends SDKBase {
         protocol: 'jsonrpc',
         methods: ['test']
         timeout: 3000,
+        dnsHandle: Function,              //处理对应服务提供者的ip地址dns的方法
         loadBalance: 'random',            //连接池中负载均衡方式，默认 ‘random’，可选 ‘random’，‘roundRobin’
         pool: {
           min: 2,                         //连接池最小连接数， 默认 2
@@ -291,10 +296,11 @@ export class Consumer extends SDKBase {
 
     async discovery() {
       const discoverer = new Discoverer(this.options);
-      discoverer.on('update:providerList', (providerList) => {
+      discoverer.on('update:providerList', async (providerList) => {
         // this.serverAddress = serverAddress;
-        this.providerList = providerList;
+        this.providerList = await this.dnsHandle(providerList);
       });
+
       await discoverer.ready();
     }
 

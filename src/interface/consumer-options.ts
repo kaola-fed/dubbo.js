@@ -5,8 +5,10 @@ export interface ConsumerOptions {
     interfaceName: string;
     jsonRpcVersion: string;
     dubboVersion: string;
-    version: string;
     group: string;
+    version: string;
+    dnsHandle: Function;
+    dnsHandlegroup: string;
     protocol: string;
     methods: string[];
     serverHosts: string[];
