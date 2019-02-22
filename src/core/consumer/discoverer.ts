@@ -86,8 +86,6 @@ export class Discoverer extends SDKBase {
 
     let isAppMatched = false;
 
-    let envHasApp = false;
-
     let providerList = providerMetaList.filter(({ meta }) => {
       app = meta.application ? meta.application : meta['default.application'];
       penv = meta.env ? meta.env : meta['default.env'];
@@ -97,19 +95,16 @@ export class Discoverer extends SDKBase {
         return pgroup === group;
       }
 
-      isAppMatched = apps.includes(app);
-      if (penv === env) {
-        envHasApp = true;
-      }
+      isAppMatched = apps.includes(app) || isAppMatched;
 
-      return (penv === env) && isAppMatched;
+      return penv === env;
     });
 
     if (providerList.length > 0) {
       return providerList;
     }
 
-    if (envHasApp) {
+    if (!isAppMatched) {
       return null;
     }
 
