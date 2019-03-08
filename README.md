@@ -179,10 +179,10 @@ dubbo
 获取，默认为 dubbo(hessian协议)
 
 #### config.dubboVersion
-dubbo暴露的接口对呀的dubbo版本，用来筛选接口，默认为 '2.8.0'版本
+dubbo暴露的接口对应的dubbo版本，用来筛选接口，默认为 '2.8.0'版本
 
 #### config.jsonRpcVersion
-jsonrpc协议暴露的接口对呀的版本，用来调用接口， 默认为 '2.0'版本
+jsonrpc协议暴露的接口对应的版本，用来调用接口， 默认为 '2.0'版本
 
 #### config.httpclient
 jsonrpc支持用户传入自己的httpclient，否则采用默认
