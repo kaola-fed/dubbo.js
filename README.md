@@ -151,8 +151,7 @@ async function launch() {
     await consumer.ready();
     // 发起调用
     consumer.invoke('getUser', [{
-        $class: 'java.lang.Long',
-        $: 4
+        id: 1
     }], ['Dubbo-Attachments: key1=1,key2=2'], {
         retry: 3,
         mock: {
