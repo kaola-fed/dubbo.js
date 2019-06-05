@@ -47,16 +47,20 @@ export class Discoverer extends SDKBase {
 
   static getProviderList(addressList) {
     return addressList.map(addr => {
-      const address = decodeURIComponent(escape(addr));
-      const { protocol, hostname, port, query } = URL.parse(address);
-      const meta = querystring.parse(query);
+      if (typeof addr === 'string') {
+        const address = decodeURIComponent(escape(addr));
+        const { protocol, hostname, port, query } = URL.parse(address);
+        const meta = querystring.parse(query);
 
-      return {
-        protocol,
-        hostname,
-        port,
-        meta
-      };
+        return {
+          protocol,
+          hostname,
+          port,
+          meta
+        };
+      }
+
+      return addr;
     });
   }
 
@@ -67,7 +71,7 @@ export class Discoverer extends SDKBase {
 
     return providerMetaList.filter(({ meta }) => {
       const METHODS = (meta.methods || '').split(',');
-      return methods.every(method => {
+      return METHODS.length === 0 || methods.every(method => {
         return METHODS.includes(method);
       });
     });
@@ -130,7 +134,7 @@ export class Discoverer extends SDKBase {
       this.emit('update:providers', addressList);
     });
 
-    await this.await('update:providers');
+    this.await('update:providerList');
   }
 
   filterProvider(providerMetaList) {
@@ -143,7 +147,7 @@ export class Discoverer extends SDKBase {
       // const env = meta.env ? meta.env : meta['default.env'];
       // const group = meta.group ? meta.group : meta['default.group'];
 
-      const isVersionMatched = !this.version || version === this.version;
+      const isVersionMatched = !version || !this.version || version === this.version;
       // const isGroupMatched = !this.group || group === this.group;
       const isProtocolMatched = !this.protocol || protocol === (this.protocol + ':');
 
