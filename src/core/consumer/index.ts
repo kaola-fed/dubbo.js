@@ -158,12 +158,15 @@ export class Consumer extends SDKBase {
       assert(options.registry || options.serverHosts, 'rpcClient.createConsumer(options) 需要指定 options.serverHosts');
     }
 
+    let defaultBeforeInvoke = providerList => Discoverer.checkEnvOrGroup(providerList, null, this.options.group, []);
+
     async invoke(method, args, headers = [], options: InvokeOptions = {
-      beforeInvoke: providerList => Discoverer.checkEnvOrGroup(providerList, null, this.options.group, []),
+      beforeInvoke: defaultBeforeInvoke,
       rpcMsgId: 1
     }) {
       options.__trace && options.__trace.start();
 
+      options.beforeInvoke = options.beforeInvoke || defaultBeforeInvoke;
       this.serverAddress = options.beforeInvoke(this.providerList, this.options, Discoverer) || [];
 
       if (this.serverAddress.length === 0) {
