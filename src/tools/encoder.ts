@@ -149,8 +149,8 @@ export default class Encoder {
       if (args && len) {
         for (index = 0; index < len; index++) {
           type = args[index]['$class'];
-          if(typeof type !=='string'){
-              continue; // log error
+          if (typeof type !== 'string') {
+            continue; // log error
           }
           _paramTypes += type.indexOf('.') !== -1
             ? 'L' + type.replace(/\./gi, '/') + ';'

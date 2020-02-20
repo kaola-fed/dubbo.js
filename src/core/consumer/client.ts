@@ -216,7 +216,7 @@ class ClientBase {
           buffer,
           protocol
         }).start())
-      , timeout);
+    , timeout);
   }
 }
 
@@ -281,7 +281,7 @@ export class ClientWithPool extends ClientBase {
         }
       }
     }
-  /**
+    /**
    * Acquire the socket connection from the pool
    * @param host
    * @param port
@@ -337,8 +337,8 @@ export class JsonRpcClient {
           reject(err);
         } else {
           resolve({
-            code: body.result ? (body.result.code || 200) : -1,
-            body
+            code: (body && body.result) ? (body.result.code || 200) : -1,
+            body: body || '服务端无返回!'
           });
         }
       });
