@@ -231,7 +231,12 @@ export class Consumer extends SDKBase {
       let buffer = null;
       // 构造jsonRpc POST请求头
       if (this.options.protocol.toLowerCase() === 'jsonrpc') {
-        options.__trace && queryHeaders.push(options.__trace.header());
+        const traceHeader = options.__trace && options.__trace.header();
+        if (Array.isArray(traceHeader)) {
+          queryHeaders = queryHeaders.concat(traceHeader);
+        } else {
+          queryHeaders.push(traceHeader);
+        }
         buffer = {
           path: `${this.options.contextPath}${this.options.interfaceName}`,
           data: {
