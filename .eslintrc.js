@@ -12,6 +12,7 @@ module.exports = {
                 SwitchCase: 1,
                 flatTernaryExpressions: true
             }
-        ]
+        ],
+        'complexity': [0, 20]
     }
 };

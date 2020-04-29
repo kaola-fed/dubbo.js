@@ -226,7 +226,6 @@ export class Consumer extends SDKBase {
       const { hostname, port } = item.meta;
       let encodeArgs = args;
 
-
       let queryHeaders = [].concat(headers);
       let buffer = null;
       // 构造jsonRpc POST请求头
